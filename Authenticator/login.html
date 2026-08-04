@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        :root {
+            --bg-body: #f0f7ff;
+            --bg-card: rgba(255,255,255,0.95);
+            --text-primary: #5a8fb5;
+            --text-secondary: #2c5a7a;
+            --text-muted: #8ab3d4;
+            --border-color: rgba(225,240,255,0.5);
+            --input-bg: #f8fcff;
+            --input-border: #e3eef9;
+            --shadow: 0 10px 40px rgba(176,216,255,0.2);
+            --btn-bg: linear-gradient(135deg, #8fc1e0, #7ab0d4);
+            --btn-hover: linear-gradient(135deg, #7ab0d4, #6aa3c9);
+            --link-color: #007bff;
+        }
+
+        .theme-galaxy { --bg-body: #0a0a1a; --bg-card: rgba(18,18,42,0.95); --text-primary: #c8b8ff; --text-secondary: #e8e8e8; --text-muted: #6a5a9a; --border-color: rgba(42,42,90,0.5); --input-bg: #1a1a3e; --input-border: #2a2a5a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #6a5a9a, #8a7aff); --btn-hover: linear-gradient(135deg, #8a7aff, #a89aff); --link-color: #8a7aff; }
+        .theme-ocean { --bg-body: #0a1628; --bg-card: rgba(15,42,74,0.95); --text-primary: #7fc8ff; --text-secondary: #e8e8e8; --text-muted: #3a6a8a; --border-color: rgba(26,58,106,0.5); --input-bg: #0d2847; --input-border: #1a3a6a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #3a6a8a, #4a9aff); --btn-hover: linear-gradient(135deg, #4a9aff, #5aaaff); --link-color: #4a9aff; }
+        .theme-forest { --bg-body: #0a1a0a; --bg-card: rgba(15,42,15,0.95); --text-primary: #7fdf7f; --text-secondary: #e8e8e8; --text-muted: #3a7a3a; --border-color: rgba(26,74,26,0.5); --input-bg: #0d2a0d; --input-border: #1a4a1a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #3a7a3a, #4abf4a); --btn-hover: linear-gradient(135deg, #4abf4a, #5adf5a); --link-color: #4abf4a; }
+        .theme-sunset { --bg-body: #1a0a0a; --bg-card: rgba(42,18,10,0.95); --text-primary: #ffb87f; --text-secondary: #e8e8e8; --text-muted: #9a6a3a; --border-color: rgba(90,42,26,0.5); --input-bg: #3e1a0a; --input-border: #5a2a1a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #9a6a3a, #ff8a4a); --btn-hover: linear-gradient(135deg, #ff8a4a, #ff9a5a); --link-color: #ff8a4a; }
+        .theme-cherry { --bg-body: #1a0a12; --bg-card: rgba(42,10,22,0.95); --text-primary: #ff7fa8; --text-secondary: #e8e8e8; --text-muted: #9a3a5a; --border-color: rgba(90,26,42,0.5); --input-bg: #3e0a1a; --input-border: #5a1a2a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #9a3a5a, #ff4a7a); --btn-hover: linear-gradient(135deg, #ff4a7a, #ff5a8a); --link-color: #ff4a7a; }
+        .theme-neon { --bg-body: #0a0a0a; --bg-card: rgba(18,18,18,0.95); --text-primary: #00ff88; --text-secondary: #e8e8e8; --text-muted: #666666; --border-color: rgba(51,51,51,0.5); --input-bg: #1a1a1a; --input-border: #333333; --shadow: 0 10px 40px rgba(0,0,0,0.6); --btn-bg: linear-gradient(135deg, #00cc66, #00ff88); --btn-hover: linear-gradient(135deg, #00ff88, #00ccff); --link-color: #00ff88; }
+        .theme-lavender { --bg-body: #1a0a2a; --bg-card: rgba(34,26,58,0.95); --text-primary: #d4a8ff; --text-secondary: #e8e8e8; --text-muted: #7a5a9a; --border-color: rgba(58,42,90,0.5); --input-bg: #2a1a3e; --input-border: #3a2a5a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #7a5a9a, #b87aff); --btn-hover: linear-gradient(135deg, #b87aff, #d4a8ff); --link-color: #b87aff; }
+        .theme-mint { --bg-body: #0a1a12; --bg-card: rgba(15,42,26,0.95); --text-primary: #7fffd4; --text-secondary: #e8e8e8; --text-muted: #3a7a6a; --border-color: rgba(26,74,58,0.5); --input-bg: #0d2a1a; --input-border: #1a4a3a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #3a7a6a, #4abfa0); --btn-hover: linear-gradient(135deg, #4abfa0, #7fffd4); --link-color: #4abfa0; }
+        .theme-coffee { --bg-body: #1a0f0a; --bg-card: rgba(34,26,18,0.95); --text-primary: #d4b896; --text-secondary: #e8e8e8; --text-muted: #7a6a5a; --border-color: rgba(58,42,26,0.5); --input-bg: #2a1a12; --input-border: #3a2a1a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #7a6a5a, #b8987a); --btn-hover: linear-gradient(135deg, #b8987a, #d4b896); --link-color: #b8987a; }
+
+        body.dark-mode {
+            --bg-body: #1a1a2e;
+            --bg-card: rgba(26,26,46,0.95);
+            --text-primary: #8fc1e0;
+            --text-secondary: #e8e8e8;
+            --text-muted: #6a8a9a;
+            --border-color: rgba(42,58,90,0.5);
+            --input-bg: #1a2a4a;
+            --input-border: #2a3a5a;
+            --shadow: 0 10px 40px rgba(0,0,0,0.4);
+            --btn-bg: linear-gradient(135deg, #3a6a8a, #2a5a7a);
+            --btn-hover: linear-gradient(135deg, #4a7a9a, #3a6a8a);
+            --link-color: #5a9acf;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-body);
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            background: var(--bg-card);
+            padding: 40px 35px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 440px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        h2 { text-align: center; color: var(--text-primary); font-size: 28px; margin-bottom: 8px; font-weight: 600; transition: color 0.3s; }
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 28px; transition: color 0.3s; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; color: var(--text-muted); font-size: 14px; font-weight: 500; margin-bottom: 6px; transition: color 0.3s; }
+        .password-wrapper { position: relative; width: 100%; }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: var(--input-bg);
+            color: var(--text-secondary);
+        }
+
+        .password-wrapper input { padding-right: 45px; }
+        input:focus { outline: none; border-color: #8fc1e0; box-shadow: 0 0 0 4px rgba(143,193,224,0.15); background: #ffffff; }
+        body.dark-mode input:focus { border-color: #5a8fb5; box-shadow: 0 0 0 4px rgba(90,143,181,0.15); background: #1a2a4a; }
+        input::placeholder { color: var(--text-muted); }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: var(--text-muted);
+            font-size: 18px;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password:hover { color: #7aadcc; }
+        .toggle-password svg { width: 20px; height: 20px; }
+
+        .forgot-password-link { text-align: right; margin-top: 6px; }
+        .forgot-password-link a { color: var(--text-muted); text-decoration: none; font-size: 13px; transition: color 0.3s; font-weight: 500; cursor: pointer; }
+        .forgot-password-link a:hover { color: var(--text-primary); text-decoration: underline; }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 6px;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(143,193,224,0.3); background: var(--btn-hover); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .links { text-align: center; margin-top: 18px; }
+        .links a { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.3s; font-weight: 500; cursor: pointer; }
+        .links a:hover { color: var(--text-primary); text-decoration: underline; }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.error { display: block; background: #fef0f2; color: #c0392b; border: 1px solid #fdd5d9; }
+        body.dark-mode .message.error { background: #2a1a1a; color: #e8747a; border: 1px solid #4a2a2a; }
+        .message.success { display: block; background: #eaf7ed; color: #27ae60; border: 1px solid #c8e6d0; }
+        body.dark-mode .message.success { background: #1a2a1a; color: #7ab87a; border: 1px solid #2a4a2a; }
+        .message.info { display: block; background: #e7f3ff; color: #004085; border: 1px solid #b8daff; }
+        body.dark-mode .message.info { background: #1a2a3a; color: #7ab8d4; border: 1px solid #2a4a6a; }
+
+        .terms-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            transition: border-color 0.3s;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            margin-top: 2px;
+            accent-color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 4px;
+            border: 2px solid var(--input-border);
+            transition: all 0.3s;
+        }
+
+        .terms-checkbox input[type="checkbox"]:checked {
+            background-color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        .terms-checkbox .terms-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            transition: color 0.3s;
+        }
+
+        .terms-checkbox .terms-text .link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s;
+            border-bottom: 1px dashed transparent;
+        }
+
+        .terms-checkbox .terms-text .link:hover {
+            border-bottom-color: var(--link-color);
+        }
+
+        .terms-checkbox .terms-text .link-policy {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s;
+            border-bottom: 1px dashed transparent;
+        }
+
+        .terms-checkbox .terms-text .link-policy:hover {
+            border-bottom-color: var(--link-color);
+        }
+
+        .terms-error {
+            color: #e74c6f;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .terms-error.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 30px 20px; max-width: 100%; }
+            h2 { font-size: 24px; }
+            .btn-primary { font-size: 15px; padding: 13px; }
+            .terms-checkbox .terms-text { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔐 Đăng Nhập</h2>
+        <p class="subtitle">Chào mừng bạn trở lại!</p>
+        <div id="message" class="message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>👤 Users / 📧 Email</label>
+                <input type="text" id="loginInput" placeholder="Nhập tên người dùng hoặc email" required>
+            </div>
+            <div class="form-group">
+                <label>🔑 Mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+                    <button type="button" class="toggle-password" id="togglePassword">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="forgot-password-link">
+                    <a onclick="window.location.href='forgot-password.html'">Quên mật khẩu?</a>
+                </div>
+            </div>
+
+            <div class="terms-section">
+                <label class="terms-checkbox">
+                    <input type="checkbox" id="termsCheckbox">
+                    <span class="terms-text">
+                        Tôi đồng ý với 
+                        <span class="link" onclick="event.preventDefault(); window.location.href='../Assets/Terms-of-Service.html'">Điều khoản</span>
+                        và 
+                        <span class="link-policy" onclick="event.preventDefault(); window.location.href='../Assets/Privacy-Policy.html'">Chính sách</span>
+                        của chúng tôi
+                    </span>
+                </label>
+                <div class="terms-error" id="termsError">⚠️ Vui lòng đồng ý với Điều khoản và Chính sách để tiếp tục!</div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="loginBtn">🚀 Đăng Nhập</button>
+        </form>
+
+        <div class="links">
+            <a onclick="window.location.href='signup.html'">📝 Đăng ký tài khoản</a>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPDDRt520fSynXCGrr2aF-KvpnS_ZuIm8",
+            authDomain: "shop-c6777.firebaseapp.com",
+            databaseURL: "https://shop-c6777-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "shop-c6777",
+            storageBucket: "shop-c6777.firebasestorage.app",
+            messagingSenderId: "43186563268",
+            appId: "1:43186563268:web:0d392ba57039a919670191"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        function applyTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            const savedTheme = localStorage.getItem('theme_name') || 'default';
+            document.body.classList.remove(
+                'theme-galaxy', 'theme-ocean', 'theme-forest', 
+                'theme-sunset', 'theme-cherry', 'theme-neon',
+                'theme-lavender', 'theme-mint', 'theme-coffee'
+            );
+            if (savedTheme !== 'default') {
+                document.body.classList.add('theme-' + savedTheme);
+            }
+        }
+
+        applyTheme();
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'theme' || e.key === 'theme_name') {
+                applyTheme();
+            }
+        });
+
+        const loginForm = document.getElementById('loginForm');
+        const loginInput = document.getElementById('loginInput');
+        const passwordInput = document.getElementById('password');
+        const messageDiv = document.getElementById('message');
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        const termsError = document.getElementById('termsError');
+
+        let isPasswordVisible = false;
+        togglePasswordBtn.addEventListener('click', () => {
+            isPasswordVisible = !isPasswordVisible;
+            passwordInput.type = isPasswordVisible ? 'text' : 'password';
+            togglePasswordBtn.innerHTML = isPasswordVisible ?
+                `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>` :
+                `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>`;
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageDiv.style.display = 'none';
+        }
+
+        async function checkUserBlocked(uid) {
+            try {
+                const snapshot = await db.ref('users/' + uid + '/blocked').once('value');
+                return snapshot.val() === true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function findEmailByUsername(username) {
+            try {
+                const snapshot = await db.ref('users').once('value');
+                const users = snapshot.val();
+                if (!users) return null;
+                
+                for (const uid in users) {
+                    if (users[uid].user && users[uid].user.toLowerCase() === username.toLowerCase()) {
+                        return users[uid].email;
+                    }
+                }
+                return null;
+            } catch (e) {
+                console.error('Lỗi tìm username:', e);
+                return null;
+            }
+        }
+
+        // Hàm kiểm tra đăng nhập tự động - KHÔNG tự động chuyển hướng
+        async function checkAutoLogin() {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    const isBlocked = await checkUserBlocked(user.uid);
+                    if (!isBlocked) {
+                        // Chỉ cập nhật presence, KHÔNG chuyển hướng
+                        await db.ref('presence/' + user.uid).set(true);
+                        db.ref('presence/' + user.uid).onDisconnect().set(false);
+                        // Cho phép người dùng ở lại trang đăng nhập
+                        showMessage('👋 Bạn đã đăng nhập! Nhấn đăng nhập để tiếp tục.', 'info');
+                    }
+                } catch (e) {
+                    console.log('Lỗi kiểm tra auto login:', e);
+                }
+            }
+        }
+
+        // Gọi kiểm tra khi load trang - KHÔNG chuyển hướng tự động
+        setTimeout(checkAutoLogin, 500);
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessage();
+            
+            if (!termsCheckbox.checked) {
+                termsError.classList.add('show');
+                termsCheckbox.style.borderColor = '#e74c6f';
+                setTimeout(() => {
+                    termsError.classList.remove('show');
+                    termsCheckbox.style.borderColor = '';
+                }, 3000);
+                return;
+            }
+            termsError.classList.remove('show');
+            
+            const loginValue = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!loginValue || !password) {
+                showMessage('⚠️ Vui lòng nhập đầy đủ thông tin!', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('loginBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Đang xử lý...';
+
+            try {
+                let email = loginValue;
+                
+                // Nếu không phải email thì tìm username
+                if (!loginValue.includes('@')) {
+                    const foundEmail = await findEmailByUsername(loginValue);
+                    if (!foundEmail) {
+                        showMessage('❌ Không tìm thấy người dùng!', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '🚀 Đăng Nhập';
+                        return;
+                    }
+                    email = foundEmail;
+                }
+
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                
+                const isBlocked = await checkUserBlocked(userCredential.user.uid);
+                if (isBlocked) {
+                    await auth.signOut();
+                    showMessage('🚫 Tài khoản của bạn đã bị khóa!', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '🚀 Đăng Nhập';
+                    return;
+                }
+
+                // Cập nhật presence
+                await db.ref('presence/' + userCredential.user.uid).set(true);
+                db.ref('presence/' + userCredential.user.uid).onDisconnect().set(false);
+
+                showMessage('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
+                submitBtn.innerHTML = '✅ Thành công!';
+                
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1500);
+                
+            } catch (error) {
+                let errorMessage = '❌ Đăng nhập thất bại! ';
+                switch (error.code) {
+                    case 'auth/user-not-found': errorMessage += 'Email không tồn tại.'; break;
+                    case 'auth/wrong-password': errorMessage += 'Mật khẩu không đúng.'; break;
+                    case 'auth/invalid-email': errorMessage += 'Email không hợp lệ.'; break;
+                    case 'auth/too-many-requests': errorMessage += 'Quá nhiều yêu cầu. Thử lại sau.'; break;
+                    default: errorMessage += error.message;
+                }
+                showMessage(errorMessage, 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '🚀 Đăng Nhập';
+            }
+        });
+
+        loginInput.focus();
+        
+    </script>
+</body>
+</html>
