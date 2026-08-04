@@ -1,227 +1,527 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lịch sử mua hàng - KuanZGame.Store</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị - KuanZGame.Store</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js">
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        /* ===== ROOT ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
         :root {
-            --bg-body: #f0f7ff;
-            --bg-card: #fff;
-            --bg-header: #fff;
+            --bg-body: #f4f8fc;
+            --bg-card: #ffffff;
+            --bg-header: #ffffff;
             --text-primary: #1a3a5a;
-            --text-secondary: #4a8ab5;
-            --text-muted: #8ab3d4;
-            --border-color: #e3eef9;
-            --shadow: 0 2px 12px rgba(0,0,0,0.06);
-            --shadow-popup: 0 8px 32px rgba(0,0,0,0.15);
+            --text-secondary: #4a7a9a;
+            --text-muted: #8ab0cc;
+            --border-color: #e2ecf5;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            --shadow-popup: 0 8px 32px rgba(0, 0, 0, 0.12);
             --wallet-bg: #f0f7ff;
-            --hover-bg: #e8f0fa;
-            --accent: #3b8fd6;
+            --hover-bg: #edf4fa;
+            --accent: #2b7fc4;
             --success: #27ae60;
             --danger: #e74c6f;
             --warning: #f39c12;
+            --purple: #6c5ce7;
+            --radius: 10px;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --radius: 12px;
+        }
+        body.dark-mode {
+            --bg-body: #14141f;
+            --bg-card: #1e1e32;
+            --bg-header: #1a1a2e;
+            --text-primary: #e2e8f0;
+            --text-secondary: #8fc1e0;
+            --text-muted: #6a8a9a;
+            --border-color: #2a3a5a;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            --shadow-popup: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --wallet-bg: #1a2a4a;
+            --hover-bg: #1f2f4f;
+            --accent: #5a9fd4;
         }
         .theme-galaxy { --bg-body: #0a0a1a; --bg-card: #12122a; --bg-header: #1a1a3e; --text-primary: #c8b8ff; --text-secondary: #8a7aff; --text-muted: #6a5a9a; --border-color: #2a2a5a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #1a1a3e; --hover-bg: #2a2a5a; --accent: #8a7aff; }
         .theme-ocean { --bg-body: #0a1628; --bg-card: #0f2a4a; --bg-header: #0d2847; --text-primary: #7fc8ff; --text-secondary: #4a9aff; --text-muted: #3a6a8a; --border-color: #1a3a6a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #0d2847; --hover-bg: #1a3a6a; --accent: #4a9aff; }
         .theme-forest { --bg-body: #0a1a0a; --bg-card: #0f2a0f; --bg-header: #0d2a0d; --text-primary: #7fdf7f; --text-secondary: #4abf4a; --text-muted: #3a7a3a; --border-color: #1a4a1a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #0d2a0d; --hover-bg: #1a4a1a; --accent: #4abf4a; }
         .theme-sunset { --bg-body: #1a0a0a; --bg-card: #2a120a; --bg-header: #3e1a0a; --text-primary: #ffb87f; --text-secondary: #ff8a4a; --text-muted: #9a6a3a; --border-color: #5a2a1a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #3e1a0a; --hover-bg: #5a2a1a; --accent: #ff8a4a; }
-        .theme-cherry { --bg-body: #1a0a12; --bg-card: #2a0a16; --bg-header: #3e0a1a; --text-primary: #ff7fa8; --text-secondary: #ff4a7a; --text-muted: #9a3a5a; --border-color: #5a1a2a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #3e1a0a; --hover-bg: #5a1a2a; --accent: #ff4a7a; }
         .theme-neon { --bg-body: #0a0a0a; --bg-card: #121212; --bg-header: #1a1a1a; --text-primary: #00ff88; --text-secondary: #00ccff; --text-muted: #666; --border-color: #333; --shadow: 0 2px 12px rgba(0,0,0,0.6); --shadow-popup: 0 8px 32px rgba(0,0,0,0.8); --wallet-bg: #1a1a1a; --hover-bg: #2a2a2a; --accent: #00ccff; }
-        .theme-lavender { --bg-body: #1a0a2a; --bg-card: #221a3a; --bg-header: #2a1a3e; --text-primary: #d4a8ff; --text-secondary: #b87aff; --text-muted: #7a5a9a; --border-color: #3a2a5a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #2a1a3e; --hover-bg: #3a2a5a; --accent: #b87aff; }
-        .theme-mint { --bg-body: #0a1a12; --bg-card: #0f2a1a; --bg-header: #0d2a1a; --text-primary: #7fffd4; --text-secondary: #4abfa0; --text-muted: #3a7a6a; --border-color: #1a4a3a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #0d2a1a; --hover-bg: #1a4a3a; --accent: #4abfa0; }
-        .theme-coffee { --bg-body: #1a0f0a; --bg-card: #221a12; --bg-header: #2a1a12; --text-primary: #d4b896; --text-secondary: #b8987a; --text-muted: #7a6a5a; --border-color: #3a2a1a; --shadow: 0 2px 12px rgba(0,0,0,0.4); --shadow-popup: 0 8px 32px rgba(0,0,0,0.6); --wallet-bg: #2a1a12; --hover-bg: #3a2a1a; --accent: #b8987a; }
-        body.dark-mode { --bg-body: #1a1a2e; --bg-card: #1a1a2e; --bg-header: #16213e; --text-primary: #e8e8e8; --text-secondary: #8fc1e0; --text-muted: #6a8a9a; --border-color: #2a3a5a; --shadow: 0 2px 12px rgba(0,0,0,0.3); --shadow-popup: 0 8px 32px rgba(0,0,0,0.5); --wallet-bg: #1a2a4a; --hover-bg: #1a2a4a; --accent: #8fc1e0; }
-        body { background: var(--bg-body); min-height: 100vh; transition: var(--transition); }
+        body { background: var(--bg-body); min-height: 100vh; transition: var(--transition); color: var(--text-primary); }
 
-        .header { background: var(--bg-header); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; transition: var(--transition); backdrop-filter: blur(12px); }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .logo { display: none; }
-        .menu-icon { cursor: pointer; padding: 6px 8px; border-radius: 8px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: var(--transition); width: 34px; height: 34px; flex-shrink: 0; }
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--bg-header);
+            padding: 6px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            min-height: 48px;
+        }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .logo { font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .menu-icon { cursor: pointer; padding: 5px 7px; border-radius: 8px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: var(--transition); width: 32px; height: 32px; flex-shrink: 0; }
         .menu-icon:hover { background: var(--hover-bg); transform: scale(1.05); }
-        .menu-icon .bar { display: block; width: 18px; height: 2px; background: var(--text-secondary); border-radius: 2px; transition: var(--transition); flex-shrink: 0; }
+        .menu-icon .bar { display: block; width: 16px; height: 2px; background: var(--text-secondary); border-radius: 2px; transition: var(--transition); flex-shrink: 0; }
         .menu-icon:hover .bar { background: var(--text-primary); }
-        .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-        .wallet-container { background: var(--wallet-bg); border: 2px solid var(--border-color); border-radius: 10px; padding: 4px 12px 4px 8px; display: flex; align-items: center; gap: 8px; transition: var(--transition); cursor: default; min-height: 36px; }
+        .header-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .wallet-container { background: var(--wallet-bg); border: 2px solid var(--border-color); border-radius: 8px; padding: 3px 10px 3px 6px; display: flex; align-items: center; gap: 6px; transition: var(--transition); min-height: 32px; }
         .wallet-container:hover { border-color: var(--accent); }
-        .wallet-icon-box { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .wallet-icon-box i { color: #fff; font-size: 13px; }
-        .wallet-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .wallet-label { font-size: 8px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .wallet-balance { font-size: 14px; font-weight: 700; color: var(--text-primary); }
-        .wallet-balance span { font-size: 10px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+        .wallet-icon-box { width: 24px; height: 24px; background: var(--accent); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .wallet-icon-box i { color: #fff; font-size: 11px; }
+        .wallet-info { display: flex; flex-direction: column; line-height: 1.15; }
+        .wallet-label { font-size: 7px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .wallet-balance { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .wallet-balance span { font-size: 9px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
 
-        .bell-icon { width: 34px; height: 34px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; transition: var(--transition); position: relative; font-size: 15px; color: var(--text-secondary); flex-shrink: 0; }
+        .bell-icon { width: 32px; height: 32px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; transition: var(--transition); position: relative; font-size: 14px; color: var(--text-secondary); flex-shrink: 0; }
         .bell-icon:hover { background: var(--hover-bg); transform: scale(1.05); color: var(--text-primary); }
-        .bell-icon .bell-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: 2px; right: 2px; border: 2px solid var(--bg-header); display: none; animation: pulse 2s infinite; }
-        .bell-icon .bell-dot.show { display: block; }
-        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        .bell-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: 1px; right: 1px; border: 2px solid var(--bg-header); display: none; animation: pulse 2s infinite; }
+        .bell-dot.show { display: block; }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
-        .settings-wrapper { position: relative; }
-        .dot-menu { width: 34px; height: 34px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: var(--transition); padding: 6px; flex-shrink: 0; }
+        /* ===== SETTINGS POPUP - FIXED POSITION ===== */
+        .settings-wrapper { 
+            position: relative; 
+            display: flex;
+            align-items: center;
+        }
+        .dot-menu { 
+            width: 32px; 
+            height: 32px; 
+            cursor: pointer; 
+            border-radius: 50%; 
+            background: var(--wallet-bg); 
+            border: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 2px; 
+            transition: var(--transition); 
+            padding: 5px; 
+            flex-shrink: 0; 
+        }
         .dot-menu:hover { background: var(--hover-bg); transform: scale(1.05); }
-        .dot-menu .dot { width: 3.5px; height: 3.5px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
+        .dot-menu .dot { width: 3px; height: 3px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
         .dot-menu:hover .dot { background: var(--text-primary); }
-        .popup { position: absolute; top: 42px; right: 0; background: var(--bg-card); border-radius: 10px; box-shadow: var(--shadow-popup); min-width: 160px; padding: 4px 0; border: 1px solid var(--border-color); opacity: 0; visibility: hidden; transform: translateY(-8px) scale(0.96); transition: var(--transition); z-index: 200; }
-        .popup.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-        .popup-item { padding: 8px 16px; color: var(--text-primary); font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px; border: none; background: none; width: 100%; font-weight: 500; }
-        .popup-item:hover { background: var(--hover-bg); padding-left: 22px; }
-        .popup-divider { height: 1px; background: var(--border-color); margin: 4px 10px; }
-        .popup-item.logout { color: var(--danger); }
+        
+        .popup { 
+            position: absolute; 
+            top: 42px; 
+            right: 0; 
+            background: var(--bg-card); 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow-popup); 
+            min-width: 180px; 
+            padding: 6px 0; 
+            border: 1px solid var(--border-color); 
+            opacity: 0; 
+            visibility: hidden; 
+            transform: translateY(-6px) scale(0.96); 
+            transition: var(--transition); 
+            z-index: 200; 
+        }
+        .popup.active { 
+            opacity: 1; 
+            visibility: visible; 
+            transform: translateY(0) scale(1); 
+        }
+        .popup-item { 
+            padding: 10px 18px; 
+            color: var(--text-primary); 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            border: none; 
+            background: none; 
+            width: 100%; 
+            font-weight: 500; 
+            text-align: left;
+        }
+        .popup-item:hover { 
+            background: var(--hover-bg); 
+            padding-left: 26px; 
+        }
+        .popup-divider { 
+            height: 1px; 
+            background: var(--border-color); 
+            margin: 4px 14px; 
+        }
+        .popup-item.logout { 
+            color: var(--danger); 
+        }
 
-        .notif-popup { position: fixed; top: 56px; right: 12px; background: var(--bg-card); border-radius: 10px; box-shadow: var(--shadow-popup); min-width: 260px; max-width: 320px; max-height: 300px; overflow-y: auto; padding: 10px 0; border: 1px solid var(--border-color); z-index: 300; opacity: 0; visibility: hidden; transform: translateY(-8px) scale(0.96); transition: var(--transition); }
+        /* ===== NOTIFICATION POPUP ===== */
+        .notif-popup {
+            position: fixed;
+            top: 52px;
+            right: 12px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-popup);
+            min-width: 300px;
+            max-width: 380px;
+            max-height: 450px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            z-index: 300;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.96);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
         .notif-popup.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-        .notif-popup .notif-header { padding: 0 12px 8px; border-bottom: 1px solid var(--border-color); font-weight: 700; color: var(--text-primary); display: flex; justify-content: space-between; font-size: 13px; }
-        .notif-popup .notif-header .close { cursor: pointer; transition: var(--transition); }
-        .notif-popup .notif-header .close:hover { color: var(--danger); }
-        .notif-popup .notif-item { padding: 8px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
-        .notif-popup .notif-item i { margin-top: 2px; color: var(--text-secondary); }
-        .notif-popup .notif-item .time { font-size: 9px; color: var(--text-muted); margin-top: 2px; display: block; }
-        .notif-popup .notif-item.unread { background: var(--wallet-bg); border-left: 3px solid var(--danger); }
+        .notif-popup .notif-header {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            background: var(--bg-card);
+        }
+        .notif-popup .notif-header .close { 
+            cursor: pointer; 
+            transition: var(--transition); 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+        }
+        .notif-popup .notif-header .close:hover { 
+            color: var(--danger); 
+            background: var(--hover-bg); 
+        }
+        .notif-popup .notif-list {
+            padding: 4px 0;
+            overflow-y: auto;
+            max-height: 320px;
+            flex: 1;
+        }
+        .notif-popup .notif-item {
+            padding: 8px 12px 8px 14px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            transition: var(--transition);
+            position: relative;
+        }
+        .notif-popup .notif-item:last-child { border-bottom: none; }
+        .notif-popup .notif-item i { 
+            margin-top: 2px; 
+            color: var(--text-secondary); 
+            flex-shrink: 0; 
+        }
+        .notif-popup .notif-item .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .notif-popup .notif-item .time { 
+            font-size: 9px; 
+            color: var(--text-muted); 
+            margin-top: 2px; 
+            display: block; 
+        }
+        .notif-popup .notif-item.unread { 
+            background: var(--wallet-bg); 
+            border-left: 3px solid var(--danger); 
+        }
         .notif-popup .notif-item.unread i { color: var(--danger); }
-        .notif-popup .empty { padding: 14px; text-align: center; color: var(--text-muted); font-size: 12px; }
-        .notif-popup .empty i { font-size: 20px; display: block; margin-bottom: 6px; }
+        .notif-popup .notif-item .delete-notif {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            transition: var(--transition);
+            flex-shrink: 0;
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+        .notif-popup .notif-item .delete-notif:hover {
+            color: var(--danger);
+            background: rgba(231, 76, 111, 0.1);
+            opacity: 1;
+        }
+        .notif-popup .empty { 
+            padding: 24px; 
+            text-align: center; 
+            color: var(--text-muted); 
+            font-size: 12px; 
+        }
+        .notif-popup .empty i { 
+            font-size: 28px; 
+            display: block; 
+            margin-bottom: 8px; 
+        }
 
-        .side-menu { position: fixed; top: 0; left: -260px; width: 240px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-popup); z-index: 300; transition: var(--transition); padding: 14px 0; border-right: 1px solid var(--border-color); overflow-y: auto; }
+        /* ===== CHAT/THÔNG BÁO ADMIN ===== */
+        .notif-popup .notif-footer {
+            padding: 10px 14px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            background: var(--bg-card);
+        }
+        .notif-popup .notif-footer input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 11px;
+            background: var(--wallet-bg);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+        .notif-popup .notif-footer input:focus { outline: none; border-color: var(--accent); }
+        .notif-popup .notif-footer button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .notif-popup .notif-footer button:hover { transform: scale(1.05); opacity: 0.9; }
+
+        /* ===== SIDE MENU ===== */
+        .side-menu { position: fixed; top: 0; left: -260px; width: 230px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-popup); z-index: 300; transition: var(--transition); padding: 12px 0; border-right: 1px solid var(--border-color); overflow-y: auto; }
         .side-menu.active { left: 0; }
-        .side-menu .menu-header { padding: 10px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .side-menu .menu-header .close { cursor: pointer; font-size: 18px; color: var(--text-muted); transition: var(--transition); }
+        .side-menu .menu-header { padding: 8px 14px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .side-menu .menu-header .close { cursor: pointer; font-size: 16px; color: var(--text-muted); transition: var(--transition); padding: 2px; }
         .side-menu .menu-header .close:hover { color: var(--danger); transform: rotate(90deg); }
-        .side-menu .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; transition: var(--transition); color: var(--text-primary); border: none; background: none; width: 100%; font-size: 13px; font-weight: 500; }
-        .side-menu .menu-item:hover { background: var(--hover-bg); padding-left: 22px; }
-        .side-menu .menu-item .icon { font-size: 16px; width: 24px; text-align: center; }
-        .side-menu .menu-divider { height: 1px; background: var(--border-color); margin: 4px 12px; }
+        .side-menu .menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; transition: var(--transition); color: var(--text-primary); border: none; background: none; width: 100%; font-size: 12px; font-weight: 500; }
+        .side-menu .menu-item:hover { background: var(--hover-bg); padding-left: 20px; }
+        .side-menu .menu-item .icon { font-size: 14px; width: 22px; text-align: center; }
+        .side-menu .menu-divider { height: 1px; background: var(--border-color); margin: 3px 12px; }
         .menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 299; opacity: 0; visibility: hidden; transition: var(--transition); }
         .menu-overlay.active { opacity: 1; visibility: visible; }
 
-        .content { padding: 14px 16px; max-width: 900px; margin: 0 auto; }
+        /* ===== CONTENT ===== */
+        .content { padding: 12px 14px; max-width: 1440px; margin: 0 auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .admin-header h1 { color: var(--text-primary); font-size: 17px; display: flex; align-items: center; gap: 6px; }
+        .admin-header .sub { color: var(--text-muted); font-size: 10px; font-weight: 400; }
+        .admin-actions { display: flex; gap: 4px; flex-wrap: wrap; }
 
-        .history-card { background: var(--bg-card); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: var(--transition); }
-        .history-card:hover { box-shadow: var(--shadow-popup); }
-        .history-card h1 { color: var(--text-primary); font-size: 18px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .history-card .sub { color: var(--text-muted); font-size: 11px; margin-bottom: 12px; }
+        /* ===== BUTTONS ===== */
+        .btn-sm { padding: 4px 12px; border: none; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+        .btn-sm:hover { transform: translateY(-1px); }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { box-shadow: 0 3px 12px rgba(43,127,196,0.3); }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { box-shadow: 0 3px 12px rgba(231,76,111,0.3); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { box-shadow: 0 3px 12px rgba(39,174,96,0.3); }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-warning:hover { box-shadow: 0 3px 12px rgba(243,156,18,0.3); }
+        .btn-outline { background: transparent; color: var(--text-secondary); border: 2px solid var(--border-color); }
+        .btn-outline:hover { background: var(--hover-bg); border-color: var(--text-secondary); }
+        .btn-back { margin-top: 10px; padding: 5px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: var(--transition); border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); width: 100%; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-back:hover { background: var(--hover-bg); border-color: var(--text-secondary); transform: translateY(-1px); }
 
-        .stats-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-        .stat-box { background: var(--wallet-bg); padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; min-width: 70px; transition: var(--transition); }
-        .stat-box:hover { border-color: var(--accent); }
-        .stat-box .num { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-        .stat-box .label { font-size: 9px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        /* ===== STATS ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .stat-card { background: var(--bg-card); padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border-color); transition: var(--transition); box-shadow: var(--shadow); }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-popup); border-color: var(--accent); }
+        .stat-card .num { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+        .stat-card .num.green { color: var(--success); }
+        .stat-card .num.red { color: var(--danger); }
+        .stat-card .num.orange { color: var(--warning); }
+        .stat-card .num.blue { color: var(--accent); }
+        .stat-card .label { font-size: 8px; color: var(--text-muted); display: flex; align-items: center; gap: 3px; margin-top: 1px; }
 
-        .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
-        .filter-bar input, .filter-bar select { padding: 4px 10px; border: 2px solid var(--border-color); border-radius: 6px; font-size: 11px; background: var(--bg-card); color: var(--text-primary); transition: var(--transition); flex: 1; min-width: 80px; }
-        .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,143,214,0.1); }
-        .filter-bar .btn-clear { padding: 4px 12px; background: var(--wallet-bg); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; color: var(--text-muted); font-size: 10px; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
-        .filter-bar .btn-clear:hover { background: var(--hover-bg); }
+        /* ===== TABS ===== */
+        .tabs { display: flex; gap: 2px; margin-bottom: 12px; border-bottom: 2px solid var(--border-color); flex-wrap: wrap; }
+        .tabs .tab { padding: 5px 12px; border: none; background: none; color: var(--text-muted); font-weight: 600; cursor: pointer; transition: var(--transition); font-size: 11px; border-bottom: 3px solid transparent; display: flex; align-items: center; gap: 4px; }
+        .tabs .tab:hover { color: var(--text-primary); }
+        .tabs .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .delete-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
-        .delete-bar .btn-delete { padding: 4px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
-        .delete-bar .btn-delete.danger { background: var(--danger); color: #fff; }
-        .delete-bar .btn-delete.danger:hover { opacity: 0.85; transform: scale(1.05); }
-        .delete-bar .btn-delete.outline { background: var(--wallet-bg); color: var(--text-muted); border: 1px solid var(--border-color); }
-        .delete-bar .btn-delete.outline:hover { background: var(--hover-bg); border-color: var(--danger); color: var(--danger); }
-        .delete-bar .btn-delete:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        /* ===== USER/ PRODUCT/ ORDER CARDS ===== */
+        .user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .user-card { background: var(--bg-card); border-radius: var(--radius); padding: 8px 10px; border: 1px solid var(--border-color); transition: var(--transition); box-shadow: var(--shadow); }
+        .user-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-popup); border-color: var(--accent); }
+        .user-card .user-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+        .user-card .user-header .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--text-secondary)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
+        .user-card .user-header .info .name { font-weight: 600; color: var(--text-primary); font-size: 11px; }
+        .user-card .user-header .info .email { font-size: 8px; color: var(--text-muted); word-break: break-all; }
+        .user-card .balance { font-size: 13px; font-weight: 700; color: var(--accent); padding: 2px 0; display: flex; align-items: center; gap: 3px; }
+        .user-card .balance i { font-size: 10px; color: var(--warning); }
+        .user-card .status { font-size: 8px; padding: 1px 6px; border-radius: 4px; display: inline-block; font-weight: 500; }
+        .user-card .status.online { background: #d4edda; color: #155724; }
+        .user-card .status.offline { background: #f8d7da; color: #721c24; }
+        .user-card .status.blocked { background: #fff3cd; color: #856404; }
+        .user-card .actions { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border-color); }
+        .user-card .actions button { padding: 2px 6px; border: none; border-radius: 4px; font-size: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 2px; }
+        .user-card .actions button:hover { transform: scale(1.05); }
+        .user-card .actions .add { background: var(--success); color: #fff; }
+        .user-card .actions .sub { background: var(--danger); color: #fff; }
+        .user-card .actions .block { background: var(--warning); color: #fff; }
+        .user-card .actions .unblock { background: var(--accent); color: #fff; }
 
-        .order-list { display: flex; flex-direction: column; gap: 8px; }
-        .order-item { background: var(--wallet-bg); border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); transition: var(--transition); position: relative; }
-        .order-item:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-        .order-item .order-checkbox { position: absolute; top: 10px; right: 10px; width: 16px; height: 16px; cursor: pointer; accent-color: var(--danger); }
-        .order-item .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; padding-right: 26px; }
-        .order-item .order-code { font-weight: 700; color: var(--accent); font-size: 13px; font-family: 'Courier New', monospace; }
-        .order-item .order-time { font-size: 10px; color: var(--text-muted); }
-        .order-item .order-status { font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-        .order-item .order-status.success { background: #d4edda; color: #155724; }
-        .order-item .order-status.failed { background: #f8d7da; color: #721c24; }
-        .order-item .order-price { font-weight: 700; color: var(--accent); font-size: 14px; white-space: nowrap; }
-        .order-item .order-body { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-color); }
-        .order-item .order-image { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid var(--border-color); flex-shrink: 0; overflow: hidden; }
-        .order-item .order-image img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }
-        .order-item .order-details { flex: 1; min-width: 0; }
-        .order-item .order-details .name { font-weight: 600; color: var(--text-primary); font-size: 13px; }
-        .order-item .order-details .desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-        .order-item .order-details .category { font-size: 9px; color: var(--text-muted); background: var(--bg-card); padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 2px; border: 1px solid var(--border-color); }
-        .order-item .order-details .meta { font-size: 10px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
-        .order-item .order-details .meta span { background: var(--bg-card); padding: 2px 6px; border-radius: 6px; display: flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); }
-        .order-item .order-data { font-size: 10px; background: var(--bg-card); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); margin-top: 4px; color: var(--text-primary); font-family: monospace; word-break: break-all; }
-        .order-item .order-data .data-preview { display: inline; }
-        .order-item .order-data .data-full { display: none; }
-        .order-item .order-data.expanded .data-preview { display: none; }
-        .order-item .order-data.expanded .data-full { display: inline; }
-        .order-item .order-data .show-more-btn { color: var(--accent); cursor: pointer; font-weight: 600; font-size: 10px; background: none; border: none; padding: 2px 4px; display: inline-block; }
-        .order-item .order-data .show-more-btn:hover { text-decoration: underline; }
-        .order-item .order-actions { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-color); }
-        .order-item .order-actions button { padding: 3px 10px; border: none; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
-        .order-item .order-actions .view { background: var(--accent); color: #fff; }
-        .order-item .order-actions .view:hover { opacity: 0.8; transform: scale(1.05); }
-        .order-item .order-actions .download { background: var(--success); color: #fff; }
-        .order-item .order-actions .download:hover { opacity: 0.8; transform: scale(1.05); }
-        .order-item .order-actions .copy-data { background: var(--warning); color: #fff; }
-        .order-item .order-actions .copy-data:hover { opacity: 0.8; transform: scale(1.05); }
-        .order-item .order-actions .delete-single { background: var(--danger); color: #fff; }
-        .order-item .order-actions .delete-single:hover { opacity: 0.8; transform: scale(1.05); }
+        .category-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .category-item { background: var(--bg-card); border-radius: var(--radius); padding: 6px 10px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; transition: var(--transition); box-shadow: var(--shadow); }
+        .category-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-popup); border-color: var(--accent); }
+        .category-item .icon { width: 28px; height: 28px; border-radius: 50%; background: var(--wallet-bg); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; overflow: hidden; }
+        .category-item .icon img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .category-item .info .name { font-weight: 600; color: var(--text-primary); font-size: 11px; }
+        .category-item .info .count { font-size: 8px; color: var(--text-muted); }
+        .category-item .actions button { padding: 1px 5px; border: none; border-radius: 4px; font-size: 8px; cursor: pointer; transition: var(--transition); }
+        .category-item .actions .edit { background: var(--wallet-bg); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .category-item .actions .edit:hover { background: var(--accent); color: #fff; }
+        .category-item .actions .del { background: #fef0f2; color: var(--danger); border: 1px solid #fdd5d9; }
+        .category-item .actions .del:hover { background: var(--danger); color: #fff; }
 
-        .empty-state { text-align: center; padding: 24px 12px; color: var(--text-muted); }
-        .empty-state .big-icon { font-size: 36px; display: block; margin-bottom: 6px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+        .product-card { background: var(--bg-card); border-radius: var(--radius); padding: 10px; border: 1px solid var(--border-color); transition: var(--transition); box-shadow: var(--shadow); }
+        .product-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-popup); border-color: var(--accent); }
+        .product-card .top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .product-card .top .img { width: 34px; height: 34px; border-radius: 6px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden; }
+        .product-card .top .img img { width: 100%; height: 100%; object-fit: cover; }
+        .product-card .top .title .name { font-weight: 600; color: var(--text-primary); font-size: 11px; }
+        .product-card .top .title .cat { font-size: 8px; color: var(--text-muted); background: var(--wallet-bg); padding: 1px 5px; border-radius: 3px; display: inline-block; margin-top: 1px; }
+        .product-card .details { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 4px; }
+        .product-card .details .item { background: var(--wallet-bg); border-radius: 4px; padding: 2px 5px; text-align: center; border: 1px solid var(--border-color); }
+        .product-card .details .item .lbl { font-size: 6px; color: var(--text-muted); text-transform: uppercase; }
+        .product-card .details .item .val { font-size: 11px; font-weight: 700; color: var(--text-primary); }
+        .product-card .details .item .val.price { color: var(--accent); }
+        .product-card .details .item .val.stock { color: var(--success); }
+        .product-card .desc { font-size: 9px; color: var(--text-muted); background: var(--wallet-bg); padding: 3px 5px; border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 4px; max-height: 32px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .product-card .actions { display: flex; gap: 3px; flex-wrap: wrap; }
+        .product-card .actions button { padding: 2px 6px; border: none; border-radius: 4px; font-size: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 2px; flex: 1; justify-content: center; }
+        .product-card .actions button:hover { transform: scale(1.05); }
+        .product-card .actions .edit { background: var(--accent); color: #fff; }
+        .product-card .actions .data { background: var(--warning); color: #fff; }
+        .product-card .actions .del { background: #fef0f2; color: var(--danger); border: 1px solid #fdd5d9; }
+        .product-card .actions .del:hover { background: var(--danger); color: #fff; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .order-list { display: flex; flex-direction: column; gap: 5px; }
+        .order-item { background: var(--bg-card); border-radius: var(--radius); padding: 6px 10px; border: 1px solid var(--border-color); transition: var(--transition); display: flex; gap: 8px; align-items: center; box-shadow: var(--shadow); }
+        .order-item:hover { transform: translateX(3px); box-shadow: var(--shadow-popup); border-color: var(--accent); }
+        .order-item .img { width: 30px; height: 30px; border-radius: 5px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; overflow: hidden; }
+        .order-item .img img { width: 100%; height: 100%; object-fit: cover; }
+        .order-item .info .name { font-weight: 600; color: var(--text-primary); font-size: 11px; }
+        .order-item .info .meta { font-size: 9px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
+        .order-item .info .meta span { display: flex; align-items: center; gap: 2px; }
+        .order-item .info .code { font-size: 9px; color: var(--accent); font-weight: 600; font-family: monospace; }
+        .order-item .badge { font-size: 8px; padding: 1px 6px; border-radius: 4px; font-weight: 500; flex-shrink: 0; }
+        .order-item .badge.success { background: #d4edda; color: #155724; }
+        .order-item .badge.failed { background: #f8d7da; color: #721c24; }
+        .order-item .del-btn { padding: 1px 6px; background: #fef0f2; color: var(--danger); border: 1px solid #fdd5d9; border-radius: 4px; cursor: pointer; transition: var(--transition); font-size: 9px; flex-shrink: 0; }
+        .order-item .del-btn:hover { background: var(--danger); color: #fff; }
+
+        .voucher-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .voucher-item { background: var(--bg-card); border-radius: var(--radius); padding: 6px 10px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow); min-width: 120px; }
+        .voucher-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-popup); border-color: var(--accent); }
+        .voucher-item .code { font-weight: 700; color: var(--accent); font-size: 12px; font-family: monospace; }
+        .voucher-item .info { flex: 1; font-size: 9px; color: var(--text-muted); }
+        .voucher-item .del-btn { padding: 1px 5px; background: #fef0f2; color: var(--danger); border: 1px solid #fdd5d9; border-radius: 4px; cursor: pointer; transition: var(--transition); font-size: 8px; }
+        .voucher-item .del-btn:hover { background: var(--danger); color: #fff; }
+
+        /* ===== MODALS ===== */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 12px; }
         .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-card); border-radius: 14px; padding: 16px 18px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); animation: modalIn 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        @keyframes modalIn { from { transform: scale(0.95) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-        .modal h3 { color: var(--text-primary); text-align: center; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; }
-        .modal .close-modal { width: 100%; padding: 6px; background: var(--wallet-bg); border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: var(--transition); margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .modal .close-modal:hover { background: var(--hover-bg); }
-        .modal .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .modal .detail-grid .d-item { background: var(--wallet-bg); border-radius: 6px; padding: 4px 8px; border: 1px solid var(--border-color); }
-        .modal .detail-grid .d-item .label { font-size: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 4px; }
-        .modal .detail-grid .d-item .value { font-size: 11px; font-weight: 600; color: var(--text-primary); margin-top: 2px; word-break: break-word; }
-        .modal .detail-grid .d-item.full { grid-column: 1 / -1; }
-        .modal .detail-grid .d-item .value.status-success { color: var(--success); }
-        .modal .detail-grid .d-item .value.status-failed { color: var(--danger); }
-        .modal .detail-grid .d-item .data-item { font-size: 10px; background: var(--bg-card); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); margin-top: 2px; font-family: monospace; word-break: break-all; }
+        .modal { background: var(--bg-card); border-radius: 14px; padding: 16px 18px; max-width: 500px; width: 100%; border: 1px solid var(--border-color); max-height: 92vh; overflow-y: auto; animation: modalIn 0.3s ease; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        @keyframes modalIn { from { transform: scale(0.95) translateY(16px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        .modal h3 { color: var(--text-primary); text-align: center; margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .modal .row { display: flex; gap: 5px; margin-bottom: 5px; align-items: center; flex-wrap: wrap; }
+        .modal .row label { color: var(--text-muted); font-size: 10px; min-width: 60px; font-weight: 500; }
+        .modal .row input, .modal .row select, .modal .row textarea { flex: 1; padding: 5px 8px; border: 2px solid var(--border-color); border-radius: 5px; font-size: 11px; background: var(--bg-card); color: var(--text-primary); transition: var(--transition); min-width: 50px; }
+        .modal .row input:focus, .modal .row select:focus, .modal .row textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(43,127,196,0.08); }
+        .modal .row textarea { min-height: 50px; resize: vertical; font-family: inherit; }
+        .modal .row .preview { width: 36px; height: 36px; border-radius: 5px; border: 2px solid var(--border-color); background: var(--wallet-bg); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; overflow: hidden; }
+        .modal .row .preview img { width: 100%; height: 100%; object-fit: cover; }
+        .modal .actions { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+        .modal .actions button { flex: 1; padding: 5px; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); min-width: 45px; display: flex; align-items: center; justify-content: center; gap: 3px; }
+        .modal .actions .cancel { background: var(--wallet-bg); color: var(--text-muted); border: 1px solid var(--border-color); }
+        .modal .actions .cancel:hover { background: var(--hover-bg); }
+        .modal .actions .save { background: var(--accent); color: #fff; }
+        .modal .actions .save:hover { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(43,127,196,0.3); }
+        .modal .actions .danger { background: var(--danger); color: #fff; }
+        .modal .actions .danger:hover { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(231,76,111,0.3); }
+        .modal .actions .success { background: var(--success); color: #fff; }
+        .modal .actions .success:hover { transform: translateY(-1px); box-shadow: 0 3px 12px rgba(39,174,96,0.3); }
 
-        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-body); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: 0.4s; }
-        .loading-overlay.hidden { opacity: 0; pointer-events: none; display: none !important; }
-        .loading-spinner { width: 36px; height: 36px; border: 4px solid var(--border-color); border-radius: 50%; border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: var(--text-primary); font-size: 13px; font-weight: 500; }
-
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 6px 16px; background: var(--bg-card); color: var(--text-primary); border-radius: 8px; box-shadow: var(--shadow-popup); border: 1px solid var(--border-color); z-index: 999; opacity: 0; transition: 0.4s; font-weight: 500; font-size: 11px; pointer-events: none; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 5px 14px; background: var(--bg-card); color: var(--text-primary); border-radius: 8px; box-shadow: var(--shadow-popup); border: 1px solid var(--border-color); z-index: 999; opacity: 0; transition: 0.35s; font-weight: 500; font-size: 10px; pointer-events: none; }
         .toast.show { opacity: 1; }
-        .toast.success { border-color: var(--success); color: var(--success); }
         .toast.error { border-color: var(--danger); color: var(--danger); }
+        .toast.success { border-color: var(--success); color: var(--success); }
 
-        @media (max-width: 600px) { 
-            .header { padding: 6px 10px; } 
-            .content { padding: 8px 10px; } 
-            .history-card { padding: 12px 14px; }
-            .wallet-container { padding: 3px 8px 3px 6px; min-height: 30px; }
-            .wallet-icon-box { width: 22px; height: 22px; }
-            .wallet-icon-box i { font-size: 10px; }
+        .empty-state { text-align: center; padding: 20px 12px; color: var(--text-muted); }
+        .empty-state .icon { font-size: 28px; display: block; margin-bottom: 3px; }
+        .loading { text-align: center; padding: 12px; color: var(--text-muted); font-size: 11px; }
+
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-body); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; transition: 0.4s; }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; display: none !important; }
+        .loading-spinner { width: 30px; height: 30px; border: 4px solid var(--border-color); border-radius: 50%; border-top-color: var(--accent); animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--text-primary); font-size: 12px; font-weight: 500; }
+
+        @media (max-width: 640px) {
+            .header { padding: 4px 8px; min-height: 40px; }
+            .logo { font-size: 13px; }
+            .content { padding: 6px 8px; }
+            .stats-grid { grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); }
+            .user-grid { grid-template-columns: 1fr; }
+            .product-grid { grid-template-columns: 1fr; }
+            .order-item { flex-wrap: wrap; }
+            .modal { padding: 10px 12px; margin: 6px; }
+            .modal .row { flex-direction: column; align-items: stretch; }
+            .modal .row label { min-width: auto; }
+            .tabs .tab { padding: 3px 8px; font-size: 10px; }
+            .admin-header h1 { font-size: 14px; }
+            .wallet-container { padding: 2px 6px 2px 4px; min-height: 26px; }
+            .wallet-icon-box { width: 20px; height: 20px; }
+            .wallet-icon-box i { font-size: 9px; }
             .wallet-balance { font-size: 11px; }
-            .wallet-label { font-size: 7px; }
-            .menu-icon { width: 28px; height: 28px; padding: 4px 6px; }
-            .menu-icon .bar { width: 14px; height: 2px; }
-            .bell-icon { width: 28px; height: 28px; font-size: 13px; }
-            .dot-menu { width: 28px; height: 28px; }
-            .notif-popup { right: 6px; left: 6px; min-width: auto; }
-            .order-item .order-header { flex-direction: column; align-items: flex-start; }
-            .modal .detail-grid { grid-template-columns: 1fr; }
-            .order-item .order-body { flex-wrap: wrap; }
-            .stats-row { flex-wrap: wrap; }
-            .stat-box { min-width: 60px; padding: 4px 10px; }
-            .stat-box .num { font-size: 14px; }
-            .filter-bar input, .filter-bar select { min-width: 60px; font-size: 10px; padding: 3px 8px; }
-            .order-item .order-checkbox { top: 6px; right: 6px; }
+            .wallet-label { font-size: 6px; }
+            .menu-icon { width: 26px; height: 26px; padding: 3px 5px; }
+            .menu-icon .bar { width: 13px; height: 2px; }
+            .bell-icon { width: 26px; height: 26px; font-size: 12px; }
+            .dot-menu { width: 26px; height: 26px; }
+            .side-menu { width: 200px; left: -220px; }
+            .popup { min-width: 140px; right: -6px; }
+            .popup-item { padding: 8px 14px; font-size: 12px; }
+            .notif-popup { right: 6px; left: 6px; min-width: auto; max-width: 100%; }
         }
     </style>
 </head>
@@ -229,11 +529,10 @@
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text">⏳ Đang tải lịch sử...</div>
+        <div class="loading-text">⏳ Đang tải...</div>
     </div>
 
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
-
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <span style="font-weight:700;color:var(--text-primary);"><i class="fas fa-bars"></i> Menu</span>
@@ -253,7 +552,7 @@
                 <span class="bar"></span>
                 <span class="bar"></span>
             </div>
-            <div class="logo"></div>
+            <div class="logo">🛠️ Admin</div>
         </div>
         <div class="header-right">
             <div class="wallet-container">
@@ -284,64 +583,150 @@
         </div>
     </header>
 
+    <!-- NOTIFICATION POPUP (CÓ CHAT + NÚT XÓA) -->
     <div class="notif-popup" id="notifPopup">
-        <div class="notif-header"><span><i class="fas fa-bullhorn"></i> Thông báo</span><span class="close" onclick="toggleNotif()"><i class="fas fa-times"></i></span></div>
-        <div id="notifList"><div class="empty"><i class="far fa-bell-slash"></i> Chưa có thông báo</div></div>
+        <div class="notif-header">
+            <span><i class="fas fa-bullhorn"></i> Thông báo</span>
+            <span class="close" onclick="toggleNotif()"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="notif-list" id="notifList">
+            <div class="empty"><i class="far fa-bell-slash"></i> Chưa có thông báo</div>
+        </div>
+        <div class="notif-footer">
+            <input type="text" id="adminChatInput" placeholder="✏️ Gửi thông báo..." maxlength="200" />
+            <button onclick="sendAdminNotification()"><i class="fas fa-paper-plane"></i> Gửi</button>
+        </div>
     </div>
 
     <div class="content">
-        <div class="history-card">
-            <h1><i class="fas fa-history"></i> Lịch sử mua hàng</h1>
-            <p class="sub">Xem lại các đơn hàng đã mua</p>
-
-            <div class="stats-row">
-                <div class="stat-box"><div class="num" id="totalOrders">0</div><div class="label"><i class="fas fa-box"></i> Tổng đơn</div></div>
-                <div class="stat-box"><div class="num" id="totalSpent">0</div><div class="label"><i class="fas fa-coins"></i> Tổng chi</div></div>
+        <div class="admin-header">
+            <div>
+                <h1><i class="fas fa-crown" style="color:var(--warning);"></i> Quản trị <span class="sub">| Quản lý hệ thống</span></h1>
             </div>
-
-            <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="🔍 Tìm theo tên sản phẩm hoặc mã đơn..." oninput="filterOrders()">
-                <select id="sortSelect" onchange="filterOrders()">
-                    <option value="newest">🕐 Mới nhất</option>
-                    <option value="oldest">🕐 Cũ nhất</option>
-                    <option value="high">💰 Giá cao → thấp</option>
-                    <option value="low">💰 Giá thấp → cao</option>
-                </select>
-                <button class="btn-clear" onclick="clearFilter()"><i class="fas fa-undo"></i> Xóa lọc</button>
-            </div>
-
-            <div class="delete-bar">
-                <button class="btn-delete danger" onclick="deleteSelectedOrders()" id="deleteSelectedBtn" disabled>
-                    <i class="fas fa-trash"></i> Xóa đã chọn
-                </button>
-                <button class="btn-delete outline" onclick="toggleSelectAll()" id="selectAllBtn">
-                    <i class="fas fa-check-double"></i> Chọn tất cả
-                </button>
-                <button class="btn-delete danger" onclick="deleteAllOrders()" style="background:var(--danger);color:#fff;">
-                    <i class="fas fa-trash-alt"></i> Xóa tất cả
-                </button>
-            </div>
-
-            <div class="order-list" id="orderList">
-                <div class="empty-state">
-                    <span class="big-icon">📦</span>
-                    <p>Chưa có đơn hàng nào</p>
-                </div>
+            <div class="admin-actions">
+                <button class="btn-sm btn-outline" onclick="refreshAll()"><i class="fas fa-sync"></i> Làm mới</button>
             </div>
         </div>
+
+        <div class="stats-grid" id="dashboardStats">
+            <div class="stat-card"><div class="num blue" id="dashUsers">0</div><div class="label"><i class="fas fa-users"></i> Người dùng</div></div>
+            <div class="stat-card"><div class="num blue" id="dashCategories">0</div><div class="label"><i class="fas fa-folder"></i> Mục SP</div></div>
+            <div class="stat-card"><div class="num orange" id="dashProducts">0</div><div class="label"><i class="fas fa-warehouse"></i> Sản phẩm</div></div>
+            <div class="stat-card"><div class="num green" id="dashOrders">0</div><div class="label"><i class="fas fa-truck"></i> Đơn hàng</div></div>
+            <div class="stat-card"><div class="num green" id="dashRevenue">0</div><div class="label"><i class="fas fa-coins"></i> DT hôm nay</div></div>
+            <div class="stat-card"><div class="num" id="dashVouchers">0</div><div class="label"><i class="fas fa-ticket-alt"></i> Mã giảm giá</div></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie"></i> Tổng quan</button>
+            <button class="tab" data-tab="users" onclick="switchTab('users')"><i class="fas fa-users"></i> Người dùng</button>
+            <button class="tab" data-tab="categories" onclick="switchTab('categories')"><i class="fas fa-folder"></i> Mục SP</button>
+            <button class="tab" data-tab="products" onclick="switchTab('products')"><i class="fas fa-warehouse"></i> Kho hàng</button>
+            <button class="tab" data-tab="orders" onclick="switchTab('orders')"><i class="fas fa-truck"></i> Đơn hàng</button>
+            <button class="tab" data-tab="vouchers" onclick="switchTab('vouchers')"><i class="fas fa-ticket-alt"></i> Mã giảm giá</button>
+        </div>
+
+        <div class="tab-content active" id="tab-dashboard">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;">
+                <div class="stat-card"><div class="num green" id="dashTodayOrders">0</div><div class="label"><i class="fas fa-shopping-cart"></i> Đơn hôm nay</div></div>
+                <div class="stat-card"><div class="num orange" id="dashTotalSold">0</div><div class="label"><i class="fas fa-box"></i> Tổng bán</div></div>
+                <div class="stat-card"><div class="num blue" id="dashOnlineUsers">0</div><div class="label"><i class="fas fa-circle" style="color:var(--success);"></i> Online</div></div>
+                <div class="stat-card"><div class="num red" id="dashBlockedUsers">0</div><div class="label"><i class="fas fa-lock"></i> Đã khóa</div></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-users">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                <button class="btn-sm btn-primary" onclick="loadUsersAdmin()"><i class="fas fa-sync"></i> Làm mới</button>
+            </div>
+            <div id="userGrid" class="user-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div></div>
+        </div>
+
+        <div class="tab-content" id="tab-categories">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                <button class="btn-sm btn-primary" onclick="openCategoryModal()"><i class="fas fa-plus"></i> Thêm mục</button>
+                <button class="btn-sm btn-danger" onclick="confirmDeleteAllCategories()"><i class="fas fa-trash"></i> Xóa tất cả</button>
+            </div>
+            <div id="categoryList" class="category-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div></div>
+        </div>
+
+        <div class="tab-content" id="tab-products">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                <button class="btn-sm btn-primary" onclick="openProductModal()"><i class="fas fa-plus"></i> Thêm SP</button>
+                <button class="btn-sm btn-danger" onclick="confirmDeleteAllProducts()"><i class="fas fa-trash"></i> Xóa tất cả</button>
+            </div>
+            <div id="productGrid" class="product-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div></div>
+        </div>
+
+        <div class="tab-content" id="tab-orders">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                <button class="btn-sm btn-danger" onclick="confirmDeleteAllOrders()"><i class="fas fa-trash"></i> Xóa tất cả đơn</button>
+            </div>
+            <div id="ordersList" class="order-list"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div></div>
+        </div>
+
+        <div class="tab-content" id="tab-vouchers">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                <button class="btn-sm btn-primary" onclick="openVoucherModal()"><i class="fas fa-plus"></i> Tạo mã</button>
+                <button class="btn-sm btn-danger" onclick="confirmDeleteAllVouchers()"><i class="fas fa-trash"></i> Xóa tất cả</button>
+            </div>
+            <div id="voucherList" class="voucher-grid"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div></div>
+        </div>
+
+        <button class="btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> Quay lại trang chủ</button>
     </div>
 
-    <div class="modal-overlay" id="detailModal">
-        <div class="modal">
-            <h3><i class="fas fa-receipt"></i> Chi tiết đơn hàng</h3>
-            <div id="detailContent"></div>
-            <button class="close-modal" onclick="closeDetailModal()"><i class="fas fa-times"></i> Đóng</button>
-        </div>
-    </div>
+    <!-- MODALS -->
+    <div class="modal-overlay" id="categoryModal"><div class="modal"><h3><i class="fas fa-folder"></i> <span id="categoryModalTitle">Thêm mục</span></h3>
+        <div class="row"><label>Tên:</label><input type="text" id="categoryName" placeholder="Tên mục" /></div>
+        <div class="row"><label>Icon:</label><input type="text" id="categoryIcon" placeholder="📁" value="📁" /></div>
+        <div class="row"><label>Hình:</label><input type="text" id="categoryImage" placeholder="URL hình ảnh" /><div class="preview" id="categoryImagePreview">🖼️</div></div>
+        <input type="hidden" id="categoryEditId" />
+        <div class="actions"><button class="save" onclick="saveCategory()"><i class="fas fa-save"></i> Lưu</button><button class="cancel" onclick="closeCategoryModal()"><i class="fas fa-times"></i> Đóng</button></div>
+    </div></div>
+
+    <div class="modal-overlay" id="productModal"><div class="modal"><h3><i class="fas fa-warehouse"></i> <span id="productModalTitle">Thêm sản phẩm</span></h3>
+        <div class="row"><label>Tên:</label><input type="text" id="productName" placeholder="Tên sản phẩm" /></div>
+        <div class="row"><label>Giá:</label><input type="number" id="productPrice" placeholder="Giá VND" /></div>
+        <div class="row"><label>Mục:</label><select id="productCategory"><option value="">Chọn mục</option></select></div>
+        <div class="row"><label>Icon:</label><input type="text" id="productIcon" placeholder="📦" value="📦" /></div>
+        <div class="row"><label>Hình ảnh:</label><div style="display:flex;gap:4px;flex:1;align-items:center;"><input type="text" id="productImage" placeholder="URL hoặc tải lên" style="flex:1;" /><button class="btn-sm btn-outline" type="button" onclick="document.getElementById('productImageInput').click()" style="flex-shrink:0;"><i class="fas fa-upload"></i></button><input type="file" id="productImageInput" accept="image/*" style="display:none" onchange="uploadProductImage()" /><div class="preview" id="productImagePreview">🖼️</div></div></div>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:3px;"><label style="min-width:auto;">Mô tả:</label><textarea id="productDesc" placeholder="Mô tả sản phẩm" rows="3"></textarea></div>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:3px;"><label style="min-width:auto;">Dữ liệu (mỗi dòng 1 món):</label><textarea id="productData" placeholder="VD:&#10;acc1:pass1&#10;acc2:pass2" rows="4"></textarea></div>
+        <input type="hidden" id="productEditId" />
+        <div class="actions"><button class="save" onclick="saveProduct()"><i class="fas fa-save"></i> Lưu</button><button class="cancel" onclick="closeProductModal()"><i class="fas fa-times"></i> Đóng</button></div>
+    </div></div>
+
+    <div class="modal-overlay" id="dataModal"><div class="modal"><h3><i class="fas fa-database"></i> Quản lý dữ liệu</h3>
+        <div class="row"><label>Sản phẩm:</label><span id="dataProductName" style="color:var(--text-primary);font-weight:600;"></span></div>
+        <div class="row"><label>Số lượng:</label><span id="dataCount" style="color:var(--accent);font-weight:700;"></span></div>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:3px;"><label style="min-width:auto;">Danh sách:</label><div class="data-list" id="dataList"></div></div>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:3px;"><label style="min-width:auto;">Thêm mới:</label><div style="display:flex;gap:3px;"><input type="text" id="dataNewItem" placeholder="Nhập dữ liệu mới" style="flex:1;" /><button class="save" onclick="addDataItem()" style="padding:3px 8px;border:none;border-radius:4px;background:var(--success);color:#fff;cursor:pointer;font-weight:600;font-size:10px;"><i class="fas fa-plus"></i> Thêm</button></div></div>
+        <input type="hidden" id="dataProductId" />
+        <div class="actions"><button class="cancel" onclick="closeDataModal()"><i class="fas fa-times"></i> Đóng</button></div>
+    </div></div>
+
+    <div class="modal-overlay" id="voucherModal"><div class="modal"><h3><i class="fas fa-ticket-alt"></i> Tạo mã giảm giá</h3>
+        <div class="row"><label>Mã:</label><input type="text" id="voucherCode" placeholder="VD: SALE10" style="text-transform:uppercase;" /></div>
+        <div class="row"><label>Loại:</label><select id="voucherType"><option value="percent">Giảm %</option><option value="fixed">Giảm tiền</option></select></div>
+        <div class="row"><label>Giá trị:</label><input type="number" id="voucherValue" placeholder="10 hoặc 50000" /></div>
+        <div class="row"><label>Số lượt:</label><input type="number" id="voucherMaxUses" placeholder="Số lần" value="10" /></div>
+        <div class="actions"><button class="save" onclick="saveVoucher()"><i class="fas fa-save"></i> Lưu</button><button class="cancel" onclick="closeVoucherModal()"><i class="fas fa-times"></i> Đóng</button></div>
+    </div></div>
+
+    <div class="modal-overlay" id="moneyModal"><div class="modal"><h3><i class="fas fa-coins"></i> <span id="moneyModalTitle">Điều chỉnh số dư</span></h3>
+        <div class="row"><label>Người dùng:</label><span id="moneyUserName" style="color:var(--text-primary);font-weight:600;"></span></div>
+        <div class="row"><label>Số dư:</label><span id="moneyCurrentBalance" style="color:var(--accent);font-weight:700;"></span></div>
+        <div class="row"><label>Số tiền:</label><input type="number" id="moneyAmount" placeholder="Nhập số tiền" /></div>
+        <div class="row"><label>Ghi chú:</label><input type="text" id="moneyNote" placeholder="Lý do" /></div>
+        <input type="hidden" id="moneyUserId" />
+        <div class="actions"><button class="success" onclick="moneyAction('add')"><i class="fas fa-plus"></i> Cộng</button><button class="danger" onclick="moneyAction('sub')"><i class="fas fa-minus"></i> Trừ</button><button class="cancel" onclick="closeMoneyModal()"><i class="fas fa-times"></i> Đóng</button></div>
+    </div></div>
 
     <div class="toast" id="toast"></div>
 
     <script>
+        // ===== FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyCPDDRt520fSynXCGrr2aF-KvpnS_ZuIm8",
             authDomain: "shop-c6777.firebaseapp.com",
@@ -354,13 +739,20 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
+        const storage = firebase.storage();
 
-        let currentUser = null;
-        let allOrders = [];
-        let isDataLoaded = false;
+        // ===== VARIABLES =====
+        let isAdmin = false;
         let categoriesData = {};
-        let selectedOrders = new Set();
+        let productsData = {};
+        let ordersData = {};
+        let vouchersData = {};
+        let usersData = {};
+        let onlineUsersMap = {};
+        let currentUserUid = null;
+        let notificationKeys = {};
 
+        // ===== TOAST =====
         function showToast(msg, type = '') {
             const el = document.getElementById('toast');
             el.textContent = msg;
@@ -370,6 +762,7 @@
             el.timeout = setTimeout(() => el.classList.remove('show'), 2500);
         }
 
+        // ===== THEME =====
         function applyTheme() {
             const isDark = localStorage.getItem('theme') === 'dark';
             document.body.classList.toggle('dark-mode', isDark);
@@ -379,30 +772,73 @@
         }
         applyTheme();
 
+        // ===== LOADING =====
         function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) { overlay.classList.add('hidden'); overlay.style.display = 'none'; }
+            const overlay = document.querySelector('.loading-overlay');
+            if (overlay) { overlay.classList.add('hidden');
+                overlay.style.display = 'none'; }
+        }
+        function showLoading() {
+            const overlay = document.querySelector('.loading-overlay');
+            if (overlay) { overlay.style.display = 'flex';
+                overlay.classList.remove('hidden'); }
         }
 
-        function loadCategories() {
-            db.ref('categories').on('value', snap => {
-                categoriesData = snap.val() || {};
-            });
+        // ===== LOAD ALL DATA =====
+        function loadAllData() {
+            db.ref('users').on('value', snap => { usersData = snap.val() || {};
+                renderUsers();
+                updateDashboard(); });
+            db.ref('presence').on('value', snap => { onlineUsersMap = snap.val() || {};
+                renderUsers(); });
+            db.ref('categories').on('value', snap => { categoriesData = snap.val() || {};
+                renderCategories();
+                updateCategorySelect();
+                updateDashboard(); });
+            db.ref('products').on('value', snap => { productsData = snap.val() || {};
+                renderProducts();
+                updateDashboard(); });
+            db.ref('orders').on('value', snap => { ordersData = snap.val() || {};
+                renderOrders();
+                updateDashboard(); });
+            db.ref('vouchers').on('value', snap => { vouchersData = snap.val() || {};
+                renderVouchers();
+                updateDashboard(); });
+            loadNotifications();
+            setTimeout(() => { hideLoading(); }, 2000);
         }
 
-        function loadNotifications(uid) {
+        // ===== NOTIFICATIONS =====
+        function loadNotifications() {
             db.ref('notifications').on('value', snap => {
                 const notifs = snap.val();
                 const list = document.getElementById('notifList');
                 const dot = document.getElementById('notifDot');
+                const uid = currentUserUid || auth.currentUser?.uid || localStorage.getItem('quickLoginUid');
+                
                 if (notifs) {
-                    const keys = Object.keys(notifs).reverse();
+                    const keys = Object.keys(notifs);
+                    notificationKeys = {};
+                    keys.forEach(k => { notificationKeys[k] = true; });
+                    
+                    const sortedKeys = keys.reverse();
                     let html = '', hasUnread = false;
-                    keys.forEach(key => {
+                    sortedKeys.forEach(key => {
                         const n = notifs[key];
                         const isUnread = !n.readBy || !n.readBy[uid];
-                        if (isUnread) hasUnread = true;
-                        html += `<div class="notif-item ${isUnread?'unread':''}"><i class="fas fa-bell"></i> ${n.message}<span class="time"><i class="far fa-clock"></i> ${new Date(n.timestamp).toLocaleString('vi-VN')}</span></div>`;
+                        if (isUnread && uid) hasUnread = true;
+                        const time = n.timestamp ? new Date(n.timestamp).toLocaleString('vi-VN') : '';
+                        const msg = n.message || 'Thông báo';
+                        html += `<div class="notif-item ${isUnread && uid ? 'unread' : ''}">
+                            <i class="fas fa-bell"></i>
+                            <div class="notif-content">
+                                <div>${msg}</div>
+                                ${time ? `<span class="time"><i class="far fa-clock"></i> ${time}</span>` : ''}
+                            </div>
+                            <button class="delete-notif" onclick="deleteNotification('${key}')" title="Xóa thông báo">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`;
                     });
                     list.innerHTML = html;
                     dot.classList.toggle('show', hasUnread && localStorage.getItem('notifEnabled') !== 'false');
@@ -413,87 +849,143 @@
             });
         }
 
-        function loadHistory(uid) {
-            db.ref('history/' + uid).on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                allOrders = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                renderOrders(allOrders);
-                updateStats(allOrders);
-                selectedOrders.clear();
-                updateDeleteButton();
+        // ===== DELETE NOTIFICATION =====
+        function deleteNotification(key) {
+            if (!confirm('🗑️ Bạn có chắc muốn xóa thông báo này?')) return;
+            db.ref('notifications/' + key).remove()
+                .then(() => {
+                    showToast('✅ Đã xóa thông báo!', 'success');
+                })
+                .catch(err => {
+                    showToast('❌ Lỗi: ' + err.message, 'error');
+                });
+        }
+
+        // ===== SEND ADMIN NOTIFICATION =====
+        function sendAdminNotification() {
+            const input = document.getElementById('adminChatInput');
+            const msg = input.value.trim();
+            if (!msg) { showToast('⚠️ Nhập nội dung thông báo!', 'error'); return; }
+            if (!currentUserUid && !auth.currentUser) { showToast('⚠️ Vui lòng đăng nhập!', 'error'); return; }
+            
+            const uid = currentUserUid || auth.currentUser.uid;
+            db.ref('users/' + uid).once('value', snap => {
+                const userData = snap.val();
+                const adminName = userData?.user || userData?.email || 'Admin';
+                db.ref('notifications').push({
+                    message: `📢 ${adminName}: ${msg}`,
+                    timestamp: Date.now(),
+                    from: 'admin',
+                    readBy: {}
+                }).then(() => {
+                    showToast('✅ Đã gửi thông báo!', 'success');
+                    input.value = '';
+                }).catch(err => showToast('❌ ' + err.message, 'error'));
             });
         }
 
-        function getCategoryName(catId) {
-            return categoriesData[catId]?.name || catId || 'Không có';
-        }
+        // Enter key for chat
+        document.getElementById('adminChatInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') sendAdminNotification();
+        });
 
-        function truncateData(data, maxLen = 64) {
-            if (!data) return { display: 'Không có dữ liệu', isTruncated: false, full: '' };
-            const str = String(data);
-            if (str.length <= maxLen) return { display: str, isTruncated: false, full: str };
-            return { display: str.substring(0, maxLen) + '...', isTruncated: true, full: str };
-        }
-
-        function renderOrders(orders) {
-            const container = document.getElementById('orderList');
-            if (orders.length === 0) {
-                container.innerHTML = `<div class="empty-state"><span class="big-icon">📦</span><p>Chưa có đơn hàng nào</p></div>`;
-                return;
+        // ===== TOGGLE NOTIFICATION =====
+        function toggleNotif() {
+            const popup = document.getElementById('notifPopup');
+            popup.classList.toggle('active');
+            const uid = currentUserUid || auth.currentUser?.uid || localStorage.getItem('quickLoginUid');
+            if (uid && localStorage.getItem('autoView') !== 'false') {
+                db.ref('notifications').once('value', snap => {
+                    const notifs = snap.val();
+                    if (notifs) Object.keys(notifs).forEach(key => db.ref('notifications/' + key + '/readBy/' + uid).set(true));
+                });
+                document.getElementById('notifDot').classList.remove('show');
             }
-            let html = '';
-            orders.forEach(order => {
-                const isChecked = selectedOrders.has(order.id);
-                const image = order.productImage || order.productIcon || '📦';
-                const price = (order.price || 0).toLocaleString('vi-VN');
-                const time = new Date(order.timestamp).toLocaleString('vi-VN');
-                const orderCode = order.orderCode || '#' + order.id.substring(0, 6).toUpperCase();
-                const desc = order.productDesc || '';
-                const quantity = order.quantity || 1;
-                const status = order.status || 'success';
-                const categoryName = getCategoryName(order.productCategory);
-                const statusText = status === 'success' ? 'Thành công' : 'Thất bại';
-                const statusClass = status === 'success' ? 'success' : 'failed';
-                const orderData = order.orderData || '';
-                const truncated = truncateData(orderData, 64);
+        }
 
+        // ===== UPDATE DASHBOARD =====
+        function updateDashboard() {
+            const u = Object.keys(usersData).length;
+            const c = Object.keys(categoriesData).length;
+            const p = Object.keys(productsData).length;
+            const o = Object.keys(ordersData).length;
+            const v = Object.keys(vouchersData).length;
+            document.getElementById('dashUsers').textContent = u;
+            document.getElementById('dashCategories').textContent = c;
+            document.getElementById('dashProducts').textContent = p;
+            document.getElementById('dashOrders').textContent = o;
+            document.getElementById('dashVouchers').textContent = v;
+
+            let todayRevenue = 0, todayOrders = 0, totalSold = 0, blocked = 0, online = 0;
+            const today = new Date(); today.setHours(0,0,0,0);
+            Object.keys(ordersData).forEach(key => {
+                const ord = ordersData[key];
+                totalSold += ord.quantity || 0;
+                if (ord.timestamp >= today.getTime()) {
+                    todayRevenue += ord.price || 0;
+                    todayOrders++;
+                }
+            });
+            Object.keys(usersData).forEach(key => {
+                if (usersData[key].blocked === true) blocked++;
+                if (onlineUsersMap[key] === true) online++;
+            });
+            document.getElementById('dashRevenue').textContent = todayRevenue.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('dashTodayOrders').textContent = todayOrders;
+            document.getElementById('dashTotalSold').textContent = totalSold;
+            document.getElementById('dashOnlineUsers').textContent = online;
+            document.getElementById('dashBlockedUsers').textContent = blocked;
+        }
+
+        // ===== SWITCH TAB =====
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            if (tab === 'users') renderUsers();
+            if (tab === 'categories') renderCategories();
+            if (tab === 'products') renderProducts();
+            if (tab === 'orders') renderOrders();
+            if (tab === 'vouchers') renderVouchers();
+            if (tab === 'dashboard') updateDashboard();
+        }
+
+        // ===== RENDER USERS =====
+        function renderUsers() {
+            const container = document.getElementById('userGrid');
+            const keys = Object.keys(usersData);
+            if (keys.length === 0) { container.innerHTML =
+                `<div class="empty-state"><span class="icon">👤</span>Chưa có người dùng</div>`; return; }
+            let html = '';
+            keys.forEach(key => {
+                const u = usersData[key];
+                if (u.isAdmin === true) return;
+                const isOnline = onlineUsersMap[key] === true;
+                const isBlocked = u.blocked === true;
+                const name = u.user || u.email || 'Chưa đặt tên';
+                const email = u.email || 'Không có email';
+                const initial = name.charAt(0).toUpperCase() || '?';
+                const statusClass = isBlocked ? 'blocked' : (isOnline ? 'online' : 'offline');
+                const statusText = isBlocked ? '🔒 Đã khóa' : (isOnline ? '🟢 Online' : '⚪ Offline');
                 html += `
-                    <div class="order-item">
-                        <input type="checkbox" class="order-checkbox" data-id="${order.id}" ${isChecked ? 'checked' : ''} onchange="toggleOrderSelection('${order.id}')" />
-                        <div class="order-header">
-                            <div>
-                                <div class="order-code"><i class="fas fa-key"></i> ${orderCode}</div>
-                                <div class="order-time"><i class="far fa-clock"></i> ${time}</div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-                                <span class="order-status ${statusClass}"><i class="fas ${status === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${statusText}</span>
-                                <div class="order-price">${price} VND</div>
+                    <div class="user-card">
+                        <div class="user-header">
+                            <div class="avatar">${initial}</div>
+                            <div class="info">
+                                <div class="name">${name}</div>
+                                <div class="email">${email}</div>
                             </div>
                         </div>
-                        <div class="order-body">
-                            <div class="order-image">
-                                ${order.productImage ? `<img src="${order.productImage}" onerror="this.style.display='none';this.parentElement.textContent='${order.productIcon || '📦'}'" />` : (order.productIcon || '📦')}
-                            </div>
-                            <div class="order-details">
-                                <div class="name">${order.productName || 'Sản phẩm'}</div>
-                                ${desc ? `<div class="desc"><i class="fas fa-info-circle"></i> ${desc}</div>` : ''}
-                                <div class="category"><i class="fas fa-tag"></i> ${categoryName}</div>
-                                <div class="meta">
-                                    <span><i class="fas fa-user"></i> ${order.userName || 'Khách hàng'}</span>
-                                    <span><i class="fas fa-boxes"></i> SL: ${quantity}</span>
-                                    ${order.voucher ? `<span><i class="fas fa-ticket-alt"></i> ${order.voucher} ${order.discountText || ''}</span>` : ''}
-                                </div>
-                                <div class="order-data">
-                                    <span class="data-preview">${truncated.display}</span>
-                                    ${truncated.isTruncated ? `<span class="data-full">${truncated.full}</span><button class="show-more-btn" onclick="toggleFullData(this)">Xem thêm</button>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="order-actions">
-                            <button class="view" onclick="viewOrderDetail('${order.id}')"><i class="fas fa-eye"></i> Xem chi tiết</button>
-                            <button class="download" onclick="downloadOrder('${order.id}')"><i class="fas fa-download"></i> Tải TXT</button>
-                            <button class="copy-data" onclick="copyOrderData('${order.id}')"><i class="fas fa-copy"></i> Copy</button>
-                            <button class="delete-single" onclick="deleteSingleOrder('${order.id}')"><i class="fas fa-trash"></i> Xóa</button>
+                        <div class="balance"><i class="fas fa-coins"></i> ${(u.balance||0).toLocaleString('vi-VN')} VND</div>
+                        <div><span class="status ${statusClass}">${statusText}</span></div>
+                        <div class="actions">
+                            <button class="add" onclick="openMoneyModal('${key}','${name.replace(/'/g,"\\'")}',${u.balance||0},'add')"><i class="fas fa-plus"></i></button>
+                            <button class="sub" onclick="openMoneyModal('${key}','${name.replace(/'/g,"\\'")}',${u.balance||0},'sub')"><i class="fas fa-minus"></i></button>
+                            ${isBlocked ? 
+                                `<button class="unblock" onclick="toggleBlock('${key}',false)"><i class="fas fa-unlock"></i></button>` :
+                                `<button class="block" onclick="toggleBlock('${key}',true)"><i class="fas fa-lock"></i></button>`
+                            }
                         </div>
                     </div>
                 `;
@@ -501,233 +993,526 @@
             container.innerHTML = html;
         }
 
-        function toggleFullData(btn) {
-            const parent = btn.closest('.order-data');
-            if (parent) {
-                parent.classList.toggle('expanded');
-                btn.textContent = parent.classList.contains('expanded') ? 'Thu gọn' : 'Xem thêm';
+        function loadUsersAdmin() { renderUsers();
+            showToast('🔄 Đã làm mới!', 'success'); }
+
+        function toggleBlock(uid, block) {
+            if (confirm(block ? '🔒 Khóa người dùng này?' : '🔓 Mở khóa?')) {
+                db.ref('users/' + uid + '/blocked').set(block).then(() => {
+                    showToast(block ? '✅ Đã khóa!' : '✅ Đã mở khóa!', 'success');
+                }).catch(err => showToast('❌ ' + err.message, 'error'));
             }
         }
 
-        function updateStats(orders) {
-            document.getElementById('totalOrders').textContent = orders.length;
-            const total = orders.reduce((sum, o) => sum + (o.price || 0), 0);
-            document.getElementById('totalSpent').textContent = total.toLocaleString('vi-VN') + ' VND';
+        // ===== MONEY - KHÔNG THÔNG BÁO =====
+        function openMoneyModal(uid, name, balance, action) {
+            document.getElementById('moneyModalTitle').textContent = action === 'add' ? '💰 Cộng tiền' : '💰 Trừ tiền';
+            document.getElementById('moneyUserName').textContent = name;
+            document.getElementById('moneyCurrentBalance').textContent = balance.toLocaleString('vi-VN') + ' VND';
+            document.getElementById('moneyAmount').value = '';
+            document.getElementById('moneyNote').value = '';
+            document.getElementById('moneyUserId').value = uid;
+            document.getElementById('moneyModal').classList.add('active');
         }
 
-        function filterOrders() {
-            const search = document.getElementById('searchInput').value.toLowerCase().trim();
-            const sort = document.getElementById('sortSelect').value;
-            let filtered = allOrders.filter(order => {
-                const name = (order.productName || '').toLowerCase();
-                const code = (order.orderCode || '').toLowerCase();
-                return name.includes(search) || code.includes(search);
+        function closeMoneyModal() { document.getElementById('moneyModal').classList.remove('active'); }
+
+        function moneyAction(action) {
+            const uid = document.getElementById('moneyUserId').value;
+            const amount = parseInt(document.getElementById('moneyAmount').value);
+            const note = document.getElementById('moneyNote').value.trim() || 'Admin điều chỉnh';
+            if (!uid || !amount || amount <= 0) { showToast('❌ Nhập số tiền hợp lệ!', 'error'); return; }
+            const isAdd = action === 'add';
+            db.ref('users/' + uid + '/balance').transaction(c => { const v = c || 0; return isAdd ? v + amount : Math.max(0,
+                    v - amount); })
+                .then(r => {
+                    showToast(`✅ ${isAdd?'Cộng':'Trừ'} ${amount.toLocaleString('vi-VN')}đ thành công!`, 'success');
+                    closeMoneyModal();
+                    // KHÔNG GỬI THÔNG BÁO
+                }).catch(err => showToast('❌ ' + err.message, 'error'));
+        }
+
+        // ===== CATEGORY CRUD =====
+        function renderCategories() {
+            const container = document.getElementById('categoryList');
+            const keys = Object.keys(categoriesData);
+            if (keys.length === 0) { container.innerHTML =
+                `<div class="empty-state"><span class="icon">📁</span>Chưa có mục</div>`; return; }
+            let html = '';
+            keys.forEach(key => {
+                const c = categoriesData[key];
+                const count = Object.keys(productsData).filter(p => productsData[p]?.category === key).length;
+                const img = c.image || '';
+                html += `
+                    <div class="category-item">
+                        <div class="icon">${img ? `<img src="${img}" onerror="this.parentElement.textContent='${c.icon||'📁'}'" />` : (c.icon||'📁')}</div>
+                        <div class="info"><div class="name">${c.name||'Chưa tên'}</div><div class="count">${count} sp</div></div>
+                        <div class="actions">
+                            <button class="edit" onclick="editCategory('${key}')"><i class="fas fa-edit"></i></button>
+                            <button class="del" onclick="deleteCategory('${key}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             });
-            switch (sort) {
-                case 'newest': filtered.sort((a,b) => (b.timestamp||0) - (a.timestamp||0)); break;
-                case 'oldest': filtered.sort((a,b) => (a.timestamp||0) - (b.timestamp||0)); break;
-                case 'high': filtered.sort((a,b) => (b.price||0) - (a.price||0)); break;
-                case 'low': filtered.sort((a,b) => (a.price||0) - (b.price||0)); break;
-                default: filtered.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
-            }
-            renderOrders(filtered);
+            container.innerHTML = html;
         }
 
-        function clearFilter() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('sortSelect').value = 'newest';
-            filterOrders();
-        }
-
-        function toggleOrderSelection(orderId) {
-            if (selectedOrders.has(orderId)) selectedOrders.delete(orderId);
-            else selectedOrders.add(orderId);
-            updateDeleteButton();
-            filterOrders();
-        }
-
-        function toggleSelectAll() {
-            const filtered = getFilteredOrders();
-            const allSelected = filtered.every(o => selectedOrders.has(o.id));
-            if (allSelected) filtered.forEach(o => selectedOrders.delete(o.id));
-            else filtered.forEach(o => selectedOrders.add(o.id));
-            updateDeleteButton();
-            filterOrders();
-        }
-
-        function getFilteredOrders() {
-            const search = document.getElementById('searchInput').value.toLowerCase().trim();
-            let filtered = allOrders.filter(order => {
-                const name = (order.productName || '').toLowerCase();
-                const code = (order.orderCode || '').toLowerCase();
-                return name.includes(search) || code.includes(search);
+        function updateCategorySelect() {
+            const sel = document.getElementById('productCategory');
+            sel.innerHTML = '<option value="">Chọn mục</option>';
+            Object.keys(categoriesData).forEach(k => {
+                const c = categoriesData[k];
+                sel.innerHTML += `<option value="${k}">${c.icon||'📁'} ${c.name}</option>`;
             });
-            return filtered;
         }
 
-        function updateDeleteButton() {
-            const btn = document.getElementById('deleteSelectedBtn');
-            const count = selectedOrders.size;
-            btn.disabled = count === 0;
-            btn.innerHTML = `<i class="fas fa-trash"></i> Xóa đã chọn (${count})`;
+        function openCategoryModal() {
+            document.getElementById('categoryModalTitle').textContent = 'Thêm mục';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categoryIcon').value = '📁';
+            document.getElementById('categoryImage').value = '';
+            document.getElementById('categoryImagePreview').textContent = '🖼️';
+            document.getElementById('categoryEditId').value = '';
+            document.getElementById('categoryModal').classList.add('active');
+            document.getElementById('categoryImage').oninput = function() {
+                const p = document.getElementById('categoryImagePreview');
+                const v = this.value.trim();
+                p.innerHTML = v ? `<img src="${v}" onerror="this.parentElement.textContent='❌'" />` : '🖼️';
+            };
         }
 
-        function deleteSingleOrder(orderId) {
-            if (!confirm('🗑️ Bạn có chắc muốn xóa đơn hàng này?')) return;
-            db.ref('history/' + currentUser.uid + '/' + orderId).remove()
-                .then(() => { showToast('✅ Đã xóa đơn hàng!', 'success'); })
-                .catch(err => { showToast('❌ Lỗi: ' + err.message, 'error'); });
+        function closeCategoryModal() { document.getElementById('categoryModal').classList.remove('active'); }
+
+        function editCategory(key) {
+            const c = categoriesData[key];
+            if (!c) return;
+            document.getElementById('categoryModalTitle').textContent = 'Sửa mục';
+            document.getElementById('categoryName').value = c.name || '';
+            document.getElementById('categoryIcon').value = c.icon || '📁';
+            document.getElementById('categoryImage').value = c.image || '';
+            document.getElementById('categoryEditId').value = key;
+            const p = document.getElementById('categoryImagePreview');
+            p.innerHTML = c.image ? `<img src="${c.image}" onerror="this.parentElement.textContent='❌'" />` : '🖼️';
+            document.getElementById('categoryModal').classList.add('active');
         }
 
-        function deleteSelectedOrders() {
-            if (selectedOrders.size === 0) { showToast('⚠️ Chưa chọn đơn hàng nào!', 'error'); return; }
-            if (!confirm(`🗑️ Xóa ${selectedOrders.size} đơn hàng đã chọn?`)) return;
-            const promises = [];
-            selectedOrders.forEach(orderId => {
-                promises.push(db.ref('history/' + currentUser.uid + '/' + orderId).remove());
-            });
-            Promise.all(promises)
-                .then(() => { selectedOrders.clear(); showToast('✅ Đã xóa đơn hàng!', 'success'); updateDeleteButton(); })
-                .catch(err => { showToast('❌ Lỗi: ' + err.message, 'error'); });
+        function saveCategory() {
+            const name = document.getElementById('categoryName').value.trim();
+            const icon = document.getElementById('categoryIcon').value.trim() || '📁';
+            const image = document.getElementById('categoryImage').value.trim();
+            const editId = document.getElementById('categoryEditId').value;
+            if (!name) { showToast('❌ Nhập tên mục!', 'error'); return; }
+            const data = { name, icon };
+            if (image) data.image = image;
+            const ref = editId ? db.ref('categories/' + editId) : db.ref('categories').push();
+            ref.set(data).then(() => { showToast(editId ? '✅ Đã cập nhật!' : '✅ Đã thêm!', 'success');
+                closeCategoryModal(); })
+                .catch(err => showToast('❌ ' + err.message, 'error'));
         }
 
-        function deleteAllOrders() {
-            if (allOrders.length === 0) { showToast('⚠️ Không có đơn hàng để xóa!', 'error'); return; }
-            if (!confirm(`🗑️ Xóa TẤT CẢ ${allOrders.length} đơn hàng?`)) return;
-            db.ref('history/' + currentUser.uid).remove()
-                .then(() => { selectedOrders.clear(); showToast('✅ Đã xóa tất cả!', 'success'); updateDeleteButton(); })
-                .catch(err => { showToast('❌ Lỗi: ' + err.message, 'error'); });
-        }
-
-        function copyOrderData(orderId) {
-            const order = allOrders.find(o => o.id === orderId);
-            if (!order) { showToast('❌ Không tìm thấy!', 'error'); return; }
-            const data = order.orderData || 'Không có dữ liệu';
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(data)
-                    .then(() => showToast('✅ Đã sao chép!', 'success'))
-                    .catch(() => fallbackCopy(data));
-            } else { fallbackCopy(data); }
-        }
-
-        function fallbackCopy(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.cssText = 'position:fixed;opacity:0;left:-9999px;';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try { document.execCommand('copy'); showToast('✅ Đã sao chép!', 'success'); } 
-            catch (err) { showToast('❌ Không thể sao chép!', 'error'); }
-            document.body.removeChild(textarea);
-        }
-
-        function viewOrderDetail(orderId) {
-            const order = allOrders.find(o => o.id === orderId);
-            if (!order) { showToast('❌ Không tìm thấy!', 'error'); return; }
-            const container = document.getElementById('detailContent');
-            const code = order.orderCode || '#' + orderId.substring(0, 6).toUpperCase();
-            const price = (order.price || 0).toLocaleString('vi-VN');
-            const time = new Date(order.timestamp).toLocaleString('vi-VN');
-            const categoryName = getCategoryName(order.productCategory);
-            const status = order.status || 'success';
-            const statusText = status === 'success' ? '✅ Thành công' : '❌ Thất bại';
-            const statusClass = status === 'success' ? 'status-success' : 'status-failed';
-            const orderData = order.orderData || 'Không có dữ liệu';
-            container.innerHTML = `
-                <div class="detail-grid">
-                    <div class="d-item"><div class="label"><i class="fas fa-key"></i> Mã đơn</div><div class="value" style="font-family:monospace;color:var(--accent);">${code}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-box"></i> Sản phẩm</div><div class="value">${order.productName || 'Không tên'}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-tag"></i> Loại mục</div><div class="value">${categoryName}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-user"></i> Người mua</div><div class="value">${order.userName || 'Khách hàng'}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-id-card"></i> Mã người dùng</div><div class="value" style="font-size:10px;font-family:monospace;">${order.userId || 'N/A'}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-clock"></i> Thời gian</div><div class="value" style="font-size:10px;">${time}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-boxes"></i> Số lượng</div><div class="value">${order.quantity || 1}</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-coins"></i> Giá</div><div class="value" style="color:var(--accent);">${price} VND</div></div>
-                    <div class="d-item"><div class="label"><i class="fas fa-check-circle"></i> Trạng thái</div><div class="value ${statusClass}">${statusText}</div></div>
-                    ${order.voucher ? `<div class="d-item full"><div class="label"><i class="fas fa-ticket-alt"></i> Mã giảm giá</div><div class="value" style="color:var(--success);">${order.voucher} ${order.discountText || ''}</div></div>` : ''}
-                    ${order.productDesc ? `<div class="d-item full"><div class="label"><i class="fas fa-info-circle"></i> Mô tả</div><div class="value" style="font-weight:400;font-size:11px;">${order.productDesc}</div></div>` : ''}
-                    <div class="d-item full"><div class="label"><i class="fas fa-database"></i> Dữ liệu nhận được</div><div class="value"><div class="data-item">${orderData}</div></div></div>
-                </div>
-            `;
-            document.getElementById('detailModal').classList.add('active');
-        }
-
-        function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
-
-        function downloadOrder(orderId) {
-            const order = allOrders.find(o => o.id === orderId);
-            if (!order) { showToast('❌ Không tìm thấy!', 'error'); return; }
-            const orderData = order.orderData || 'Không có dữ liệu';
-            try {
-                const blob = new Blob([orderData], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'DuLieu_DonHang_' + (order.orderCode || orderId.substring(0, 6)).replace('#', '') + '.txt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('✅ Đã tải xuống!', 'success');
-            } catch (error) {
-                showToast('❌ Lỗi khi tải file!', 'error');
+        function deleteCategory(key) {
+            if (confirm('🗑️ Xóa mục này?')) {
+                db.ref('categories/' + key).remove().then(() => showToast('✅ Đã xóa!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
             }
         }
 
-        auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                window.location.replace('../Authenticator/login.html');
+        function confirmDeleteAllCategories() {
+            if (confirm('🗑️ Xóa TẤT CẢ mục?')) {
+                db.ref('categories').remove().then(() => showToast('✅ Đã xóa tất cả!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        // ===== PRODUCT IMAGE UPLOAD =====
+        function uploadProductImage() {
+            const fileInput = document.getElementById('productImageInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['jpg','jpeg','png','gif','webp','svg'].includes(ext)) {
+                showToast('❌ Chỉ hỗ trợ ảnh!', 'error');
                 return;
             }
-            currentUser = user;
-            db.ref('presence/' + user.uid).set(true);
-            db.ref('presence/' + user.uid).onDisconnect().set(false);
-            db.ref('users/' + user.uid + '/balance').on('value', snap => {
-                document.getElementById('balanceAmount').textContent = (snap.val() || 0).toLocaleString('vi-VN');
+            const path = `product_images/${Date.now()}_${file.name}`;
+            const ref = storage.ref(path);
+            const uploadTask = ref.put(file);
+            uploadTask.on('state_changed', null,
+                err => { showToast('❌ Lỗi upload: ' + err.message, 'error'); },
+                () => {
+                    ref.getDownloadURL().then(url => {
+                        document.getElementById('productImage').value = url;
+                        document.getElementById('productImagePreview').innerHTML =
+                            `<img src="${url}" onerror="this.parentElement.textContent='❌'" />`;
+                        showToast('✅ Đã tải ảnh lên!', 'success');
+                    }).catch(err => showToast('❌ ' + err.message, 'error'));
+                }
+            );
+        }
+
+        // ===== PRODUCT CRUD =====
+        function renderProducts() {
+            const container = document.getElementById('productGrid');
+            const keys = Object.keys(productsData);
+            if (keys.length === 0) { container.innerHTML =
+                `<div class="empty-state"><span class="icon">📦</span>Kho hàng trống</div>`; return; }
+            let html = '';
+            keys.forEach(key => {
+                const p = productsData[key];
+                const dataList = p.data ? p.data.split('\n').filter(d => d.trim() !== '') : [];
+                const stock = dataList.length;
+                const catName = categoriesData[p.category]?.name || 'Không mục';
+                const catIcon = categoriesData[p.category]?.icon || '📁';
+                html += `
+                    <div class="product-card">
+                        <div class="top">
+                            <div class="img">${p.image ? `<img src="${p.image}" onerror="this.parentElement.textContent='${p.icon||'📦'}'" />` : (p.icon||'📦')}</div>
+                            <div class="title">
+                                <div class="name">${p.name||'Sản phẩm'}</div>
+                                <div class="cat">${catIcon} ${catName}</div>
+                            </div>
+                        </div>
+                        <div class="details">
+                            <div class="item"><div class="lbl">Giá</div><div class="val price">${(p.price||0).toLocaleString('vi-VN')}đ</div></div>
+                            <div class="item"><div class="lbl">Tồn kho</div><div class="val stock">${stock}</div></div>
+                            <div class="item"><div class="lbl">Đã bán</div><div class="val">${p.sold||0}</div></div>
+                            <div class="item"><div class="lbl">Trạng thái</div><div class="val" style="color:${stock>0?'var(--success)':'var(--danger)'};font-size:10px;">${stock>0?'🟢 Còn':'🔴 Hết'}</div></div>
+                        </div>
+                        ${p.description ? `<div class="desc">${p.description}</div>` : ''}
+                        <div class="actions">
+                            <button class="edit" onclick="editProduct('${key}')"><i class="fas fa-edit"></i> Sửa</button>
+                            <button class="data" onclick="openDataModal('${key}','${p.name.replace(/'/g,"\\'")}')"><i class="fas fa-database"></i> Data (${stock})</button>
+                            <button class="del" onclick="deleteProduct('${key}')"><i class="fas fa-trash"></i> Xóa</button>
+                        </div>
+                    </div>
+                `;
             });
-            loadCategories();
-            loadHistory(user.uid);
-            loadNotifications(user.uid);
-            if (!isDataLoaded) { isDataLoaded = true; hideLoading(); }
+            container.innerHTML = html;
+        }
+
+        function openProductModal() {
+            document.getElementById('productModalTitle').textContent = 'Thêm sản phẩm';
+            ['productName','productPrice','productCategory','productIcon','productImage','productDesc','productData'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.type !== 'number') el.value = '';
+                else if (el) el.value = '';
+            });
+            document.getElementById('productIcon').value = '📦';
+            document.getElementById('productImagePreview').textContent = '🖼️';
+            document.getElementById('productEditId').value = '';
+            updateCategorySelect();
+            document.getElementById('productModal').classList.add('active');
+            document.getElementById('productImageInput').value = '';
+            document.getElementById('productImage').oninput = function() {
+                const p = document.getElementById('productImagePreview');
+                const v = this.value.trim();
+                p.innerHTML = v ? `<img src="${v}" onerror="this.parentElement.textContent='❌'" />` : '🖼️';
+            };
+        }
+
+        function closeProductModal() { document.getElementById('productModal').classList.remove('active'); }
+
+        function editProduct(key) {
+            const p = productsData[key];
+            if (!p) return;
+            document.getElementById('productModalTitle').textContent = 'Sửa sản phẩm';
+            document.getElementById('productName').value = p.name || '';
+            document.getElementById('productPrice').value = p.price || '';
+            document.getElementById('productCategory').value = p.category || '';
+            document.getElementById('productIcon').value = p.icon || '📦';
+            document.getElementById('productImage').value = p.image || '';
+            document.getElementById('productDesc').value = p.description || '';
+            document.getElementById('productData').value = p.data || '';
+            document.getElementById('productEditId').value = key;
+            const preview = document.getElementById('productImagePreview');
+            preview.innerHTML = p.image ? `<img src="${p.image}" onerror="this.parentElement.textContent='❌'" />` : '🖼️';
+            document.getElementById('productImageInput').value = '';
+            updateCategorySelect();
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function saveProduct() {
+            const name = document.getElementById('productName').value.trim();
+            const price = parseInt(document.getElementById('productPrice').value);
+            const category = document.getElementById('productCategory').value;
+            const icon = document.getElementById('productIcon').value.trim() || '📦';
+            const image = document.getElementById('productImage').value.trim();
+            const description = document.getElementById('productDesc').value.trim();
+            const dataRaw = document.getElementById('productData').value;
+            const dataString = dataRaw.split('\n').map(d => d.trim()).filter(d => d !== '').join('\n');
+            const editId = document.getElementById('productEditId').value;
+            if (!name) { showToast('❌ Nhập tên sản phẩm!', 'error'); return; }
+            if (!price || price < 0) { showToast('❌ Nhập giá hợp lệ!', 'error'); return; }
+            if (!category) { showToast('❌ Chọn mục!', 'error'); return; }
+            if (!dataString) { showToast('❌ Nhập ít nhất 1 dữ liệu!', 'error'); return; }
+            const data = { name, price, category, icon, data: dataString, sold: 0 };
+            if (image) data.image = image;
+            if (description) data.description = description;
+            const ref = editId ? db.ref('products/' + editId) : db.ref('products').push();
+            ref.set(data).then(() => {
+                const count = dataString.split('\n').length;
+                showToast(editId ? '✅ Đã cập nhật!' : `✅ Đã thêm ${count} món!`, 'success');
+                closeProductModal();
+            }).catch(err => showToast('❌ ' + err.message, 'error'));
+        }
+
+        function deleteProduct(key) {
+            if (confirm('🗑️ Xóa sản phẩm?')) {
+                db.ref('products/' + key).remove().then(() => showToast('✅ Đã xóa!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        function confirmDeleteAllProducts() {
+            if (confirm('🗑️ Xóa TẤT CẢ sản phẩm?')) {
+                db.ref('products').remove().then(() => showToast('✅ Đã xóa tất cả!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        // ===== DATA MANAGEMENT =====
+        function openDataModal(productId, productName) {
+            const p = productsData[productId];
+            if (!p) { showToast('❌ Không tìm thấy!', 'error'); return; }
+            const dataArray = p.data ? p.data.split('\n').filter(d => d.trim() !== '') : [];
+            document.getElementById('dataProductName').textContent = productName;
+            document.getElementById('dataCount').textContent = dataArray.length;
+            document.getElementById('dataProductId').value = productId;
+            document.getElementById('dataNewItem').value = '';
+            renderDataList(dataArray);
+            document.getElementById('dataModal').classList.add('active');
+        }
+
+        function renderDataList(data) {
+            const container = document.getElementById('dataList');
+            if (data.length === 0) { container.innerHTML =
+                `<div style="text-align:center;color:var(--text-muted);padding:4px;">Chưa có dữ liệu</div>`; return; }
+            let html = '';
+            data.forEach((item, i) => {
+                html +=
+                    `<div class="item"><span>${i+1}. ${item}</span><span class="remove" onclick="removeDataItem(${i})"><i class="fas fa-times"></i></span></div>`;
+            });
+            container.innerHTML = html;
+            document.getElementById('dataCount').textContent = data.length;
+        }
+
+        function addDataItem() {
+            const input = document.getElementById('dataNewItem');
+            const newItem = input.value.trim();
+            if (!newItem) { showToast('❌ Nhập dữ liệu!', 'error'); return; }
+            const productId = document.getElementById('dataProductId').value;
+            const p = productsData[productId];
+            if (!p) { showToast('❌ Không tìm thấy!', 'error'); return; }
+            const current = p.data ? p.data.split('\n').filter(d => d.trim() !== '') : [];
+            current.push(newItem);
+            const newStr = current.join('\n');
+            db.ref('products/' + productId + '/data').set(newStr).then(() => {
+                showToast('✅ Đã thêm!', 'success');
+                renderDataList(current);
+                productsData[productId].data = newStr;
+                renderProducts();
+            }).catch(err => showToast('❌ ' + err.message, 'error'));
+        }
+
+        function removeDataItem(index) {
+            if (!confirm('🗑️ Xóa dữ liệu này?')) return;
+            const productId = document.getElementById('dataProductId').value;
+            const p = productsData[productId];
+            if (!p) { showToast('❌ Không tìm thấy!', 'error'); return; }
+            const current = p.data ? p.data.split('\n').filter(d => d.trim() !== '') : [];
+            current.splice(index, 1);
+            const newStr = current.join('\n');
+            db.ref('products/' + productId + '/data').set(newStr).then(() => {
+                showToast('✅ Đã xóa!', 'success');
+                renderDataList(current);
+                productsData[productId].data = newStr;
+                renderProducts();
+            }).catch(err => showToast('❌ ' + err.message, 'error'));
+        }
+
+        function closeDataModal() { document.getElementById('dataModal').classList.remove('active'); }
+
+        // ===== ORDERS =====
+        function renderOrders() {
+            const container = document.getElementById('ordersList');
+            const keys = Object.keys(ordersData);
+            if (keys.length === 0) { container.innerHTML =
+                `<div class="empty-state"><span class="icon">📦</span>Chưa có đơn hàng</div>`; return; }
+            let html = '';
+            const sorted = keys.sort((a, b) => (ordersData[b]?.timestamp || 0) - (ordersData[a]?.timestamp || 0));
+            sorted.forEach(key => {
+                const o = ordersData[key];
+                const status = o.status || 'success';
+                html += `
+                    <div class="order-item">
+                        <div class="img">${o.productImage ? `<img src="${o.productImage}" onerror="this.parentElement.textContent='${o.productIcon||'📦'}'" />` : (o.productIcon||'📦')}</div>
+                        <div class="info">
+                            <div class="name">${o.productName||'Sản phẩm'}</div>
+                            <div class="meta">
+                                <span><i class="fas fa-coins"></i> ${(o.price||0).toLocaleString('vi-VN')}đ</span>
+                                <span><i class="fas fa-user"></i> ${o.userName||'Khách'}</span>
+                                <span class="code"><i class="fas fa-key"></i> ${o.orderCode||'#'+key.substring(0,6)}</span>
+                                <span><i class="fas fa-clock"></i> ${new Date(o.timestamp).toLocaleString('vi-VN')}</span>
+                            </div>
+                        </div>
+                        <span class="badge ${status}">${status==='success'?'✅ Thành công':'❌ Thất bại'}</span>
+                        <button class="del-btn" onclick="deleteOrder('${key}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteOrder(key) {
+            if (confirm('🗑️ Xóa đơn hàng?')) {
+                db.ref('orders/' + key).remove().then(() => showToast('✅ Đã xóa!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        function confirmDeleteAllOrders() {
+            if (confirm('🗑️ Xóa TẤT CẢ đơn hàng?')) {
+                db.ref('orders').remove().then(() => showToast('✅ Đã xóa tất cả!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        // ===== VOUCHERS =====
+        function renderVouchers() {
+            const container = document.getElementById('voucherList');
+            const keys = Object.keys(vouchersData);
+            if (keys.length === 0) { container.innerHTML =
+                `<div class="empty-state"><span class="icon">🎫</span>Chưa có mã giảm giá</div>`; return; }
+            let html = '';
+            keys.forEach(key => {
+                const v = vouchersData[key];
+                const typeText = v.type === 'percent' ? `${v.value}%` : `${v.value.toLocaleString('vi-VN')}đ`;
+                html += `
+                    <div class="voucher-item">
+                        <span class="code">${key}</span>
+                        <span class="info">Giảm ${typeText} • ${v.usedCount||0}/${v.maxUses||0} lượt</span>
+                        <button class="del-btn" onclick="deleteVoucher('${key}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function openVoucherModal() {
+            document.getElementById('voucherCode').value = '';
+            document.getElementById('voucherType').value = 'percent';
+            document.getElementById('voucherValue').value = '';
+            document.getElementById('voucherMaxUses').value = '10';
+            document.getElementById('voucherModal').classList.add('active');
+        }
+
+        function closeVoucherModal() { document.getElementById('voucherModal').classList.remove('active'); }
+
+        function saveVoucher() {
+            const code = document.getElementById('voucherCode').value.trim().toUpperCase();
+            const type = document.getElementById('voucherType').value;
+            const value = parseInt(document.getElementById('voucherValue').value);
+            const maxUses = parseInt(document.getElementById('voucherMaxUses').value) || 10;
+            if (!code) { showToast('❌ Nhập mã!', 'error'); return; }
+            if (!value || value <= 0) { showToast('❌ Nhập giá trị!', 'error'); return; }
+            if (type === 'percent' && value > 100) { showToast('❌ % không quá 100!', 'error'); return; }
+            db.ref('vouchers/' + code).set({ type, value, maxUses, usedCount: 0 })
+                .then(() => { showToast('✅ Đã tạo!', 'success');
+                    closeVoucherModal(); })
+                .catch(err => showToast('❌ ' + err.message, 'error'));
+        }
+
+        function deleteVoucher(key) {
+            if (confirm(`🗑️ Xóa mã "${key}"?`)) {
+                db.ref('vouchers/' + key).remove().then(() => showToast('✅ Đã xóa!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        function confirmDeleteAllVouchers() {
+            if (confirm('🗑️ Xóa TẤT CẢ mã?')) {
+                db.ref('vouchers').remove().then(() => showToast('✅ Đã xóa tất cả!', 'success'))
+                    .catch(err => showToast('❌ ' + err.message, 'error'));
+            }
+        }
+
+        // ===== REFRESH =====
+        function refreshAll() {
+            showLoading();
+            setTimeout(() => {
+                loadAllData();
+                setTimeout(() => { hideLoading();
+                    showToast('🔄 Đã làm mới!', 'success'); }, 1000);
+            }, 500);
+        }
+
+        // ===== AUTH =====
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                db.ref('users/' + user.uid).once('value', snap => {
+                    const data = snap.val();
+                    if (!data || data.isAdmin !== true) {
+                        alert('⚠️ Không có quyền truy cập!');
+                        window.location.replace('../index.html');
+                        return;
+                    }
+                    isAdmin = true;
+                    loadAllData();
+                });
+                db.ref('users/' + user.uid + '/balance').on('value', snap => {
+                    document.getElementById('balanceAmount').textContent = (snap.val() || 0).toLocaleString('vi-VN');
+                });
+            } else {
+                const quickUid = localStorage.getItem('quickLoginUid');
+                if (quickUid) {
+                    db.ref('users/' + quickUid).once('value', snap => {
+                        const data = snap.val();
+                        if (data && data.isAdmin === true) {
+                            currentUserUid = quickUid;
+                            loadAllData();
+                            db.ref('users/' + quickUid + '/balance').on('value', s => {
+                                document.getElementById('balanceAmount').textContent = (s.val() || 0).toLocaleString('vi-VN');
+                            });
+                        } else {
+                            window.location.replace('login.html');
+                        }
+                    });
+                } else {
+                    window.location.replace('login.html');
+                }
+            }
+            setTimeout(() => { hideLoading(); }, 3000);
         });
 
-        function toggleMenu() { 
-            document.getElementById('sideMenu').classList.toggle('active');
-            document.getElementById('menuOverlay').classList.toggle('active'); 
-        }
-
-        function closeMenu() { 
-            document.getElementById('sideMenu').classList.remove('active');
-            document.getElementById('menuOverlay').classList.remove('active'); 
-        }
-
+        // ===== MENU =====
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active');
+            document.getElementById('menuOverlay').classList.toggle('active'); }
+        function closeMenu() { document.getElementById('sideMenu').classList.remove('active');
+            document.getElementById('menuOverlay').classList.remove('active'); }
+        
         function togglePopup(e) { 
             e.stopPropagation();
-            document.getElementById('settingsPopup').classList.toggle('active'); 
+            const popup = document.getElementById('settingsPopup');
+            popup.classList.toggle('active');
         }
+        
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('settingsPopup');
             const wrapper = document.querySelector('.settings-wrapper');
-            if (!wrapper.contains(e.target)) popup.classList.remove('active');
+            if (wrapper && !wrapper.contains(e.target)) {
+                popup.classList.remove('active');
+            }
         });
 
-        function toggleNotif() {
-            const popup = document.getElementById('notifPopup');
-            popup.classList.toggle('active');
-            const user = auth.currentUser;
-            if (user && localStorage.getItem('autoView') !== 'false') {
-                db.ref('notifications').once('value', snap => {
-                    const notifs = snap.val();
-                    if (notifs) Object.keys(notifs).forEach(key => db.ref('notifications/' + key + '/readBy/' + user.uid).set(true));
-                });
-                document.getElementById('notifDot').classList.remove('show');
-            }
-        }
-
-        function goHome() { closeMenu(); window.location.href = '../index.html'; }
-        function goHistory() { closeMenu(); window.location.href = 'history.html'; }
-        function goTopup() { closeMenu(); showToast('💰 Đang phát triển!', 'error'); }
-        function goSupport() { closeMenu(); showToast('🆘 Đang phát triển!', 'error'); }
+        function goHome() { closeMenu();
+            window.location.href = '../index.html'; }
+        function goHistory() { closeMenu();
+            window.location.href = '../Pages/history.html'; }
+        function goTopup() { closeMenu();
+            showToast('💰 Đang phát triển!', 'error'); }
+        function goSupport() { closeMenu();
+            showToast('🆘 Đang phát triển!', 'error'); }
         function goToProfile() { window.location.href = '../Users/profile.html'; }
         function goToSecurity() { window.location.href = '../Users/security.html'; }
         function goToSettings() { window.location.href = '../Users/settings.html'; }
@@ -741,20 +1526,20 @@
                     localStorage.removeItem('quickLoginEmail');
                     localStorage.removeItem('quickLoginToken');
                     localStorage.removeItem('quickLoginPending');
-                    window.location.replace('../Authenticator/login.html');
+                    window.location.replace('login.html');
                 });
             }
         }
 
-        document.getElementById('detailModal').addEventListener('click', function(e) {
-            if (e.target === this) closeDetailModal();
+        document.querySelectorAll('.modal-overlay').forEach(el => {
+            el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
         });
 
         window.addEventListener('storage', function(e) {
             if (e.key === 'theme' || e.key === 'theme_name') { applyTheme(); }
         });
 
-        setTimeout(() => { if (!isDataLoaded) hideLoading(); }, 3000);
+        showLoading();
     </script>
 </body>
 </html>
