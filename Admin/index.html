@@ -99,17 +99,80 @@
         .bell-dot.show { display: block; }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
-        .settings-wrapper { position: relative; }
-        .dot-menu { width: 32px; height: 32px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: var(--transition); padding: 5px; flex-shrink: 0; }
+        /* ===== SETTINGS POPUP - FIXED ===== */
+        .settings-wrapper { 
+            position: relative; 
+            display: flex;
+            align-items: center;
+        }
+        .dot-menu { 
+            width: 32px; 
+            height: 32px; 
+            cursor: pointer; 
+            border-radius: 50%; 
+            background: var(--wallet-bg); 
+            border: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 2px; 
+            transition: var(--transition); 
+            padding: 5px; 
+            flex-shrink: 0; 
+        }
         .dot-menu:hover { background: var(--hover-bg); transform: scale(1.05); }
         .dot-menu .dot { width: 3px; height: 3px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
         .dot-menu:hover .dot { background: var(--text-primary); }
-        .popup { position: absolute; top: 38px; right: 0; background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow-popup); min-width: 170px; padding: 4px 0; border: 1px solid var(--border-color); opacity: 0; visibility: hidden; transform: translateY(-6px) scale(0.96); transition: var(--transition); z-index: 200; }
-        .popup.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-        .popup-item { padding: 10px 16px; color: var(--text-primary); font-size: 13px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px; border: none; background: none; width: 100%; font-weight: 500; }
-        .popup-item:hover { background: var(--hover-bg); padding-left: 24px; }
-        .popup-divider { height: 1px; background: var(--border-color); margin: 4px 12px; }
-        .popup-item.logout { color: var(--danger); }
+        
+        .popup { 
+            position: absolute; 
+            top: 40px; 
+            right: 0; 
+            background: var(--bg-card); 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow-popup); 
+            min-width: 180px; 
+            padding: 6px 0; 
+            border: 1px solid var(--border-color); 
+            opacity: 0; 
+            visibility: hidden; 
+            transform: translateY(-6px) scale(0.96); 
+            transition: var(--transition); 
+            z-index: 200; 
+        }
+        .popup.active { 
+            opacity: 1; 
+            visibility: visible; 
+            transform: translateY(0) scale(1); 
+        }
+        .popup-item { 
+            padding: 10px 18px; 
+            color: var(--text-primary); 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            border: none; 
+            background: none; 
+            width: 100%; 
+            font-weight: 500; 
+            text-align: left;
+        }
+        .popup-item:hover { 
+            background: var(--hover-bg); 
+            padding-left: 26px; 
+        }
+        .popup-divider { 
+            height: 1px; 
+            background: var(--border-color); 
+            margin: 4px 14px; 
+        }
+        .popup-item.logout { 
+            color: var(--danger); 
+        }
 
         /* ===== NOTIFICATION POPUP ===== */
         .notif-popup {
@@ -119,9 +182,9 @@
             background: var(--bg-card);
             border-radius: 12px;
             box-shadow: var(--shadow-popup);
-            min-width: 280px;
-            max-width: 360px;
-            max-height: 400px;
+            min-width: 300px;
+            max-width: 380px;
+            max-height: 450px;
             overflow: hidden;
             border: 1px solid var(--border-color);
             z-index: 300;
@@ -145,15 +208,24 @@
             flex-shrink: 0;
             background: var(--bg-card);
         }
-        .notif-popup .notif-header .close { cursor: pointer; transition: var(--transition); padding: 2px 6px; border-radius: 4px; }
-        .notif-popup .notif-header .close:hover { color: var(--danger); background: var(--hover-bg); }
+        .notif-popup .notif-header .close { 
+            cursor: pointer; 
+            transition: var(--transition); 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+        }
+        .notif-popup .notif-header .close:hover { 
+            color: var(--danger); 
+            background: var(--hover-bg); 
+        }
         .notif-popup .notif-list {
-            padding: 6px 0;
+            padding: 4px 0;
             overflow-y: auto;
             max-height: 320px;
+            flex: 1;
         }
         .notif-popup .notif-item {
-            padding: 8px 14px;
+            padding: 8px 12px 8px 14px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
             font-size: 12px;
@@ -161,14 +233,65 @@
             align-items: flex-start;
             gap: 8px;
             transition: var(--transition);
+            position: relative;
         }
         .notif-popup .notif-item:last-child { border-bottom: none; }
-        .notif-popup .notif-item i { margin-top: 2px; color: var(--text-secondary); flex-shrink: 0; }
-        .notif-popup .notif-item .time { font-size: 9px; color: var(--text-muted); margin-top: 2px; display: block; }
-        .notif-popup .notif-item.unread { background: var(--wallet-bg); border-left: 3px solid var(--danger); }
+        .notif-popup .notif-item i { 
+            margin-top: 2px; 
+            color: var(--text-secondary); 
+            flex-shrink: 0; 
+        }
+        .notif-popup .notif-item .notif-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .notif-popup .notif-item .time { 
+            font-size: 9px; 
+            color: var(--text-muted); 
+            margin-top: 2px; 
+            display: block; 
+        }
+        .notif-popup .notif-item.unread { 
+            background: var(--wallet-bg); 
+            border-left: 3px solid var(--danger); 
+        }
         .notif-popup .notif-item.unread i { color: var(--danger); }
-        .notif-popup .empty { padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
-        .notif-popup .empty i { font-size: 24px; display: block; margin-bottom: 6px; }
+        
+        /* ===== DELETE BUTTON ON NOTIFICATION ===== */
+        .notif-popup .notif-item .delete-notif {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            transition: var(--transition);
+            flex-shrink: 0;
+            margin-left: 4px;
+            opacity: 0.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notif-popup .notif-item .delete-notif:hover {
+            color: var(--danger);
+            background: rgba(231, 76, 111, 0.1);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .notif-popup .empty { 
+            padding: 24px; 
+            text-align: center; 
+            color: var(--text-muted); 
+            font-size: 12px; 
+        }
+        .notif-popup .empty i { 
+            font-size: 28px; 
+            display: block; 
+            margin-bottom: 8px; 
+        }
 
         /* ===== CHAT/THÔNG BÁO ADMIN ===== */
         .notif-popup .notif-footer {
@@ -191,7 +314,7 @@
         }
         .notif-popup .notif-footer input:focus { outline: none; border-color: var(--accent); }
         .notif-popup .notif-footer button {
-            padding: 6px 12px;
+            padding: 6px 14px;
             border: none;
             border-radius: 8px;
             background: var(--accent);
@@ -403,9 +526,9 @@
             .bell-icon { width: 26px; height: 26px; font-size: 12px; }
             .dot-menu { width: 26px; height: 26px; }
             .side-menu { width: 200px; left: -220px; }
-            .popup { min-width: 140px; right: -10px; }
-            .popup-item { padding: 8px 12px; font-size: 12px; }
-            .notif-popup { right: 6px; left: 6px; min-width: auto; }
+            .popup { min-width: 140px; right: -6px; }
+            .popup-item { padding: 8px 14px; font-size: 12px; }
+            .notif-popup { right: 6px; left: 6px; min-width: auto; max-width: 100%; }
         }
     </style>
 </head>
@@ -467,7 +590,7 @@
         </div>
     </header>
 
-    <!-- NOTIFICATION POPUP (CÓ CHAT) -->
+    <!-- NOTIFICATION POPUP -->
     <div class="notif-popup" id="notifPopup">
         <div class="notif-header">
             <span><i class="fas fa-bullhorn"></i> Thông báo</span>
@@ -710,7 +833,13 @@
                         const msg = n.message || 'Thông báo';
                         html += `<div class="notif-item ${isUnread && uid ? 'unread' : ''}">
                             <i class="fas fa-bell"></i>
-                            <div><div>${msg}</div>${time ? `<span class="time"><i class="far fa-clock"></i> ${time}</span>` : ''}</div>
+                            <div class="notif-content">
+                                <div>${msg}</div>
+                                ${time ? `<span class="time"><i class="far fa-clock"></i> ${time}</span>` : ''}
+                            </div>
+                            <button class="delete-notif" onclick="deleteNotification('${key}')" title="Xóa thông báo">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>`;
                     });
                     list.innerHTML = html;
@@ -720,6 +849,18 @@
                     dot.classList.remove('show');
                 }
             });
+        }
+
+        // ===== DELETE NOTIFICATION =====
+        function deleteNotification(key) {
+            if (!confirm('🗑️ Bạn có chắc muốn xóa thông báo này?')) return;
+            db.ref('notifications/' + key).remove()
+                .then(() => {
+                    showToast('✅ Đã xóa thông báo!', 'success');
+                })
+                .catch(err => {
+                    showToast('❌ Lỗi: ' + err.message, 'error');
+                });
         }
 
         // ===== SEND ADMIN NOTIFICATION =====
@@ -1325,7 +1466,6 @@
                     document.getElementById('balanceAmount').textContent = (snap.val() || 0).toLocaleString('vi-VN');
                 });
             } else {
-                // Check quick login
                 const quickUid = localStorage.getItem('quickLoginUid');
                 if (quickUid) {
                     db.ref('users/' + quickUid).once('value', snap => {
@@ -1352,12 +1492,19 @@
             document.getElementById('menuOverlay').classList.toggle('active'); }
         function closeMenu() { document.getElementById('sideMenu').classList.remove('active');
             document.getElementById('menuOverlay').classList.remove('active'); }
-        function togglePopup(e) { e.stopPropagation();
-            document.getElementById('settingsPopup').classList.toggle('active'); }
+        
+        function togglePopup(e) { 
+            e.stopPropagation();
+            const popup = document.getElementById('settingsPopup');
+            popup.classList.toggle('active');
+        }
+        
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('settingsPopup');
             const wrapper = document.querySelector('.settings-wrapper');
-            if (!wrapper.contains(e.target)) popup.classList.remove('active');
+            if (wrapper && !wrapper.contains(e.target)) {
+                popup.classList.remove('active');
+            }
         });
 
         function goHome() { closeMenu();
