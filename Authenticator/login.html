@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập</title>
+    <title>Đăng Nhập - KuanZGame.Store</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -23,6 +23,9 @@
             --btn-bg: linear-gradient(135deg, #8fc1e0, #7ab0d4);
             --btn-hover: linear-gradient(135deg, #7ab0d4, #6aa3c9);
             --link-color: #007bff;
+            --success: #27ae60;
+            --danger: #e74c6f;
+            --warning: #f39c12;
         }
 
         .theme-galaxy { --bg-body: #0a0a1a; --bg-card: rgba(18,18,42,0.95); --text-primary: #c8b8ff; --text-secondary: #e8e8e8; --text-muted: #6a5a9a; --border-color: rgba(42,42,90,0.5); --input-bg: #1a1a3e; --input-border: #2a2a5a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #6a5a9a, #8a7aff); --btn-hover: linear-gradient(135deg, #8a7aff, #a89aff); --link-color: #8a7aff; }
@@ -110,7 +113,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .toggle-password:hover { color: #7aadcc; }
         .toggle-password svg { width: 20px; height: 20px; }
 
@@ -131,7 +133,6 @@
             transition: all 0.3s;
             margin-top: 6px;
         }
-
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(143,193,224,0.3); background: var(--btn-hover); }
         .btn-primary:active { transform: translateY(0); }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
@@ -147,7 +148,6 @@
             font-size: 14px;
             display: none;
         }
-
         .message.error { display: block; background: #fef0f2; color: #c0392b; border: 1px solid #fdd5d9; }
         body.dark-mode .message.error { background: #2a1a1a; color: #e8747a; border: 1px solid #4a2a2a; }
         .message.success { display: block; background: #eaf7ed; color: #27ae60; border: 1px solid #c8e6d0; }
@@ -161,7 +161,6 @@
             border-top: 1px solid var(--border-color);
             transition: border-color 0.3s;
         }
-
         .terms-checkbox {
             display: flex;
             align-items: flex-start;
@@ -169,7 +168,6 @@
             cursor: pointer;
             padding: 4px 0;
         }
-
         .terms-checkbox input[type="checkbox"] {
             width: 18px;
             height: 18px;
@@ -181,19 +179,16 @@
             border: 2px solid var(--input-border);
             transition: all 0.3s;
         }
-
         .terms-checkbox input[type="checkbox"]:checked {
             background-color: var(--text-primary);
             border-color: var(--text-primary);
         }
-
         .terms-checkbox .terms-text {
             font-size: 13px;
             color: var(--text-secondary);
             line-height: 1.5;
             transition: color 0.3s;
         }
-
         .terms-checkbox .terms-text .link {
             color: var(--link-color);
             text-decoration: none;
@@ -202,11 +197,9 @@
             transition: color 0.3s;
             border-bottom: 1px dashed transparent;
         }
-
         .terms-checkbox .terms-text .link:hover {
             border-bottom-color: var(--link-color);
         }
-
         .terms-checkbox .terms-text .link-policy {
             color: var(--link-color);
             text-decoration: none;
@@ -215,20 +208,119 @@
             transition: color 0.3s;
             border-bottom: 1px dashed transparent;
         }
-
         .terms-checkbox .terms-text .link-policy:hover {
             border-bottom-color: var(--link-color);
         }
-
         .terms-error {
             color: #e74c6f;
             font-size: 12px;
             margin-top: 4px;
             display: none;
         }
+        .terms-error.show { display: block; }
 
-        .terms-error.show {
-            display: block;
+        /* 2FA Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px 28px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            animation: modalIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.95) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .modal h3 {
+            color: var(--text-primary);
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .modal .modal-desc {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .modal .otp-input {
+            width: 100%;
+            text-align: center;
+            font-size: 28px;
+            letter-spacing: 10px;
+            padding: 12px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+        .modal .otp-input:focus {
+            letter-spacing: 10px;
+        }
+        .modal .otp-error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+        .modal .otp-error.show { display: block; }
+        .modal .attempts-text {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        .modal .btn-verify {
+            width: 100%;
+            padding: 12px;
+            background: var(--btn-bg);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        .modal .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(90,143,181,0.3);
+        }
+        .modal .btn-verify:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .modal .btn-cancel {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 6px;
+        }
+        .modal .btn-cancel:hover {
+            background: var(--hover-bg);
         }
 
         @media (max-width: 480px) {
@@ -236,6 +328,8 @@
             h2 { font-size: 24px; }
             .btn-primary { font-size: 15px; padding: 13px; }
             .terms-checkbox .terms-text { font-size: 12px; }
+            .modal { padding: 20px; }
+            .modal .otp-input { font-size: 22px; letter-spacing: 6px; }
         }
     </style>
 </head>
@@ -288,6 +382,19 @@
         </div>
     </div>
 
+    <!-- 2FA MODAL -->
+    <div class="modal-overlay" id="twofaModal">
+        <div class="modal">
+            <h3>🔐 Xác thực 2 lớp</h3>
+            <p class="modal-desc">Nhập mã OTP từ Google Authenticator để hoàn tất đăng nhập</p>
+            <input type="text" class="otp-input" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off">
+            <div class="otp-error" id="otpError">❌ Mã OTP không đúng! Vui lòng thử lại.</div>
+            <div class="attempts-text">Còn <span id="attemptCount">3</span> lần thử</div>
+            <button class="btn-verify" id="btnVerifyOTP" onclick="verifyOTP()">✅ Xác nhận</button>
+            <button class="btn-cancel" onclick="closeOTPModal()">❌ Hủy đăng nhập</button>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCPDDRt520fSynXCGrr2aF-KvpnS_ZuIm8",
@@ -303,6 +410,61 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // ===== 2FA OTP Class =====
+        class OTPVerifier {
+            constructor() {
+                this.authenticator = {
+                    check: (token, secret) => this.verifyTOTP(token, secret),
+                    generate: (secret) => this.generateTOTP(secret)
+                };
+            }
+            base32Decode(base32) {
+                const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                const bytes = []; let bits = 0, value = 0;
+                for (let i = 0; i < base32.length; i++) {
+                    const idx = alphabet.indexOf(base32[i].toUpperCase());
+                    if (idx === -1) continue;
+                    value = (value << 5) | idx; bits += 5;
+                    if (bits >= 8) { bytes.push((value >> (bits - 8)) & 0xFF); bits -= 8; }
+                }
+                return new Uint8Array(bytes);
+            }
+            async hmacSha1(key, data) {
+                const keyData = typeof key === 'string' ? this.base32Decode(key) : key;
+                const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+                return new Uint8Array(await crypto.subtle.sign('HMAC', cryptoKey, data));
+            }
+            dynamicTruncation(hmac) {
+                const offset = hmac[hmac.length - 1] & 0xF;
+                const binary = ((hmac[offset] & 0x7F) << 24) | ((hmac[offset + 1] & 0xFF) << 16) | ((hmac[offset + 2] & 0xFF) << 8) | (hmac[offset + 3] & 0xFF);
+                return binary % 1000000;
+            }
+            async generateHOTP(secret, counter) {
+                const counterBytes = new Uint8Array(8);
+                for (let i = 7; i >= 0; i--) { counterBytes[i] = counter & 0xFF; counter = counter >> 8; }
+                const hmac = await this.hmacSha1(secret, counterBytes);
+                return String(this.dynamicTruncation(hmac)).padStart(6, '0');
+            }
+            async generateTOTP(secret, window = 0) {
+                return await this.generateHOTP(secret, Math.floor(Date.now() / 30000) + window);
+            }
+            async verifyTOTP(token, secret) {
+                if (!token || token.length !== 6 || !secret || secret.length < 10) return false;
+                try {
+                    for (const w of [0, -1, 1]) {
+                        if (await this.generateTOTP(secret, w) === token) return true;
+                    }
+                    return false;
+                } catch { return false; }
+            }
+        }
+
+        const otpVerifier = new OTPVerifier();
+        let pendingUser = null;
+        let otpAttempts = 3;
+        let isVerifying = false;
+
+        // ===== THEME =====
         function applyTheme() {
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
@@ -319,15 +481,12 @@
                 document.body.classList.add('theme-' + savedTheme);
             }
         }
-
         applyTheme();
-
         window.addEventListener('storage', function(e) {
-            if (e.key === 'theme' || e.key === 'theme_name') {
-                applyTheme();
-            }
+            if (e.key === 'theme' || e.key === 'theme_name') { applyTheme(); }
         });
 
+        // ===== DOM =====
         const loginForm = document.getElementById('loginForm');
         const loginInput = document.getElementById('loginInput');
         const passwordInput = document.getElementById('password');
@@ -357,28 +516,118 @@
             messageDiv.style.display = 'block';
         }
 
-        function hideMessage() {
-            messageDiv.style.display = 'none';
+        function hideMessage() { messageDiv.style.display = 'none'; }
+
+        function showOTPModal() {
+            document.getElementById('twofaModal').classList.add('active');
+            document.getElementById('otpInput').value = '';
+            document.getElementById('otpError').classList.remove('show');
+            otpAttempts = 3;
+            document.getElementById('attemptCount').textContent = otpAttempts;
+            setTimeout(() => document.getElementById('otpInput').focus(), 200);
         }
 
-        async function checkUserBlocked(uid) {
-            try {
-                const snapshot = await db.ref('users/' + uid + '/blocked').once('value');
-                return snapshot.val() === true;
-            } catch (e) {
-                return false;
+        function closeOTPModal() {
+            document.getElementById('twofaModal').classList.remove('active');
+            pendingUser = null;
+            otpAttempts = 3;
+            isVerifying = false;
+            document.getElementById('btnVerifyOTP').disabled = false;
+            document.getElementById('btnVerifyOTP').textContent = '✅ Xác nhận';
+        }
+
+        async function verifyOTP() {
+            if (isVerifying) return;
+            const otpInput = document.getElementById('otpInput');
+            const otpValue = otpInput.value.trim();
+            if (otpValue.length !== 6 || !/^\d{6}$/.test(otpValue)) {
+                document.getElementById('otpError').textContent = '❌ Vui lòng nhập đúng mã OTP 6 số!';
+                document.getElementById('otpError').classList.add('show');
+                otpInput.classList.add('error');
+                return;
             }
+
+            if (!pendingUser) {
+                document.getElementById('otpError').textContent = '❌ Lỗi: Không tìm thấy thông tin đăng nhập!';
+                document.getElementById('otpError').classList.add('show');
+                return;
+            }
+
+            isVerifying = true;
+            const btn = document.getElementById('btnVerifyOTP');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xác thực...';
+
+            try {
+                const isValid = await otpVerifier.authenticator.check(otpValue, pendingUser.twofaSecret);
+                if (isValid) {
+                    document.getElementById('otpError').classList.remove('show');
+                    otpInput.classList.add('success');
+                    btn.innerHTML = '✅ Thành công!';
+                    
+                    // Complete login
+                    await db.ref('presence/' + pendingUser.uid).set(true);
+                    db.ref('presence/' + pendingUser.uid).onDisconnect().set(false);
+                    showMessage('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
+                    
+                    // Set quick login for session
+                    localStorage.setItem('quickLoginUid', pendingUser.uid);
+                    localStorage.setItem('quickLoginToken', 'session_active');
+                    localStorage.setItem('quickLoginPending', 'true');
+                    
+                    setTimeout(() => {
+                        closeOTPModal();
+                        window.location.href = '../index.html';
+                    }, 1000);
+                } else {
+                    otpAttempts--;
+                    document.getElementById('attemptCount').textContent = otpAttempts;
+                    otpInput.classList.add('error');
+                    document.getElementById('otpError').textContent = `❌ Mã OTP không đúng! Còn ${otpAttempts} lần thử.`;
+                    document.getElementById('otpError').classList.add('show');
+                    if (otpAttempts <= 0) {
+                        document.getElementById('otpError').textContent = '❌ Bạn đã nhập sai quá nhiều lần! Vui lòng đăng nhập lại.';
+                        setTimeout(() => {
+                            closeOTPModal();
+                            pendingUser = null;
+                            showMessage('⚠️ Đã hủy đăng nhập do nhập sai quá nhiều lần.', 'error');
+                        }, 2000);
+                        return;
+                    }
+                    otpInput.value = '';
+                    otpInput.focus();
+                }
+            } catch (error) {
+                document.getElementById('otpError').textContent = '❌ Lỗi xác thực: ' + error.message;
+                document.getElementById('otpError').classList.add('show');
+            }
+
+            isVerifying = false;
+            btn.disabled = false;
+            btn.innerHTML = '✅ Xác nhận';
         }
 
+        // Enter key for OTP
+        document.getElementById('otpInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') verifyOTP();
+        });
+        document.getElementById('otpInput').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length === 6) {
+                document.getElementById('otpError').classList.remove('show');
+                this.classList.remove('error');
+            }
+        });
+
+        // ===== FIND USER =====
         async function findEmailByUsername(username) {
             try {
                 const snapshot = await db.ref('users').once('value');
                 const users = snapshot.val();
                 if (!users) return null;
-                
                 for (const uid in users) {
                     if (users[uid].user && users[uid].user.toLowerCase() === username.toLowerCase()) {
-                        return users[uid].email;
+                        return { email: users[uid].email, uid: uid, data: users[uid] };
                     }
                 }
                 return null;
@@ -388,28 +637,14 @@
             }
         }
 
-        // Hàm kiểm tra đăng nhập tự động - KHÔNG tự động chuyển hướng
-        async function checkAutoLogin() {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    const isBlocked = await checkUserBlocked(user.uid);
-                    if (!isBlocked) {
-                        // Chỉ cập nhật presence, KHÔNG chuyển hướng
-                        await db.ref('presence/' + user.uid).set(true);
-                        db.ref('presence/' + user.uid).onDisconnect().set(false);
-                        // Cho phép người dùng ở lại trang đăng nhập
-                        showMessage('👋 Bạn đã đăng nhập! Nhấn đăng nhập để tiếp tục.', 'info');
-                    }
-                } catch (e) {
-                    console.log('Lỗi kiểm tra auto login:', e);
-                }
-            }
+        async function checkUserBlocked(uid) {
+            try {
+                const snapshot = await db.ref('users/' + uid + '/blocked').once('value');
+                return snapshot.val() === true;
+            } catch (e) { return false; }
         }
 
-        // Gọi kiểm tra khi load trang - KHÔNG chuyển hướng tự động
-        setTimeout(checkAutoLogin, 500);
-
+        // ===== LOGIN =====
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessage();
@@ -439,17 +674,18 @@
 
             try {
                 let email = loginValue;
+                let userInfo = null;
                 
-                // Nếu không phải email thì tìm username
                 if (!loginValue.includes('@')) {
-                    const foundEmail = await findEmailByUsername(loginValue);
-                    if (!foundEmail) {
+                    const result = await findEmailByUsername(loginValue);
+                    if (!result) {
                         showMessage('❌ Không tìm thấy người dùng!', 'error');
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '🚀 Đăng Nhập';
                         return;
                     }
-                    email = foundEmail;
+                    email = result.email;
+                    userInfo = result;
                 }
 
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
@@ -463,12 +699,42 @@
                     return;
                 }
 
-                // Cập nhật presence
-                await db.ref('presence/' + userCredential.user.uid).set(true);
-                db.ref('presence/' + userCredential.user.uid).onDisconnect().set(false);
+                // Check 2FA
+                const userData = userInfo ? userInfo.data : null;
+                const uid = userCredential.user.uid;
+                let twofaSecret = null;
+                
+                if (userData && userData.twofaSecret) {
+                    twofaSecret = userData.twofaSecret;
+                } else {
+                    const snap = await db.ref('users/' + uid + '/twofaSecret').once('value');
+                    twofaSecret = snap.val();
+                }
+                
+                const twofaEnabled = twofaSecret && twofaSecret.length > 0;
 
+                if (twofaEnabled) {
+                    // Pause login, show OTP modal
+                    pendingUser = {
+                        uid: uid,
+                        twofaSecret: twofaSecret,
+                        email: email
+                    };
+                    showOTPModal();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '🚀 Đăng Nhập';
+                    return;
+                }
+
+                // No 2FA - login immediately
+                await db.ref('presence/' + uid).set(true);
+                db.ref('presence/' + uid).onDisconnect().set(false);
                 showMessage('✅ Đăng nhập thành công! Đang chuyển hướng...', 'success');
                 submitBtn.innerHTML = '✅ Thành công!';
+                
+                localStorage.setItem('quickLoginUid', uid);
+                localStorage.setItem('quickLoginToken', 'session_active');
+                localStorage.setItem('quickLoginPending', 'true');
                 
                 setTimeout(() => {
                     window.location.href = '../index.html';
@@ -490,7 +756,20 @@
         });
 
         loginInput.focus();
-        
+
+        // ===== Auto-login check - NO auto redirect =====
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const isBlocked = await checkUserBlocked(user.uid);
+                    if (!isBlocked) {
+                        await db.ref('presence/' + user.uid).set(true);
+                        db.ref('presence/' + user.uid).onDisconnect().set(false);
+                        showMessage('👋 Bạn đã đăng nhập! Nhấn đăng nhập để tiếp tục.', 'info');
+                    }
+                } catch (e) { console.log('Lỗi auto check:', e); }
+            }
+        });
     </script>
 </body>
 </html>
