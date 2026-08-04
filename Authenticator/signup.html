@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký</title>
+    <title>Đăng Ký - KuanZGame.Store</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -23,12 +23,9 @@
             --btn-bg: linear-gradient(135deg, #8fc1e0, #7ab0d4);
             --btn-hover: linear-gradient(135deg, #7ab0d4, #6aa3c9);
             --link-color: #007bff;
-            --weak-color: #e74c3c;
-            --medium-color: #f39c12;
-            --strong-color: #27ae60;
-            --success-color: #27ae60;
-            --error-color: #e74c3c;
-            --warning-color: #f39c12;
+            --success: #27ae60;
+            --danger: #e74c6f;
+            --warning: #f39c12;
         }
 
         .theme-galaxy { --bg-body: #0a0a1a; --bg-card: rgba(18,18,42,0.95); --text-primary: #c8b8ff; --text-secondary: #e8e8e8; --text-muted: #6a5a9a; --border-color: rgba(42,42,90,0.5); --input-bg: #1a1a3e; --input-border: #2a2a5a; --shadow: 0 10px 40px rgba(0,0,0,0.4); --btn-bg: linear-gradient(135deg, #6a5a9a, #8a7aff); --btn-hover: linear-gradient(135deg, #8a7aff, #a89aff); --link-color: #8a7aff; }
@@ -109,16 +106,15 @@
             transition: all 0.3s;
             min-height: 20px;
         }
-
         .input-status .icon { font-size: 14px; }
-        .input-status.valid { color: var(--success-color); }
-        .input-status.invalid { color: var(--error-color); }
-        .input-status.checking { color: var(--warning-color); }
+        .input-status.valid { color: var(--success); }
+        .input-status.invalid { color: var(--danger); }
+        .input-status.checking { color: var(--warning); }
         .input-status.idle { color: var(--text-muted); }
 
-        input.valid { border-color: var(--success-color); }
-        input.invalid { border-color: var(--error-color); }
-        input.checking { border-color: var(--warning-color); }
+        input.valid { border-color: var(--success); }
+        input.invalid { border-color: var(--danger); }
+        input.checking { border-color: var(--warning); }
 
         .toggle-password {
             position: absolute;
@@ -136,19 +132,14 @@
             align-items: center;
             justify-content: center;
         }
-
         .toggle-password:hover { color: #7aadcc; }
         .toggle-password svg { width: 20px; height: 20px; }
 
-        /* Password Strength - Simplified */
         .password-strength {
             margin-top: 8px;
             display: none;
         }
-
-        .password-strength.show {
-            display: block;
-        }
+        .password-strength.show { display: block; }
 
         .strength-bar {
             width: 100%;
@@ -158,28 +149,15 @@
             overflow: hidden;
             transition: background 0.3s;
         }
-
         .strength-bar-fill {
             height: 100%;
             width: 0%;
             border-radius: 4px;
             transition: width 0.4s ease, background 0.4s ease;
         }
-
-        .strength-bar-fill.weak {
-            width: 33%;
-            background: var(--weak-color);
-        }
-
-        .strength-bar-fill.medium {
-            width: 66%;
-            background: var(--medium-color);
-        }
-
-        .strength-bar-fill.strong {
-            width: 100%;
-            background: var(--strong-color);
-        }
+        .strength-bar-fill.weak { width: 33%; background: #e74c3c; }
+        .strength-bar-fill.medium { width: 66%; background: #f39c12; }
+        .strength-bar-fill.strong { width: 100%; background: #27ae60; }
 
         .strength-text {
             font-size: 12px;
@@ -190,26 +168,11 @@
             align-items: center;
             margin-top: 4px;
         }
-
-        .strength-text .label {
-            color: var(--text-muted);
-        }
-
-        .strength-text .value {
-            font-weight: 700;
-        }
-
-        .strength-text .value.weak {
-            color: var(--weak-color);
-        }
-
-        .strength-text .value.medium {
-            color: var(--medium-color);
-        }
-
-        .strength-text .value.strong {
-            color: var(--strong-color);
-        }
+        .strength-text .label { color: var(--text-muted); }
+        .strength-text .value { font-weight: 700; }
+        .strength-text .value.weak { color: #e74c3c; }
+        .strength-text .value.medium { color: #f39c12; }
+        .strength-text .value.strong { color: #27ae60; }
 
         .password-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; transition: color 0.3s; }
 
@@ -226,7 +189,6 @@
             transition: all 0.3s;
             margin-top: 6px;
         }
-
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(143,193,224,0.3); background: var(--btn-hover); }
         .btn-primary:active { transform: translateY(0); }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
@@ -242,7 +204,6 @@
             font-size: 14px;
             display: none;
         }
-
         .message.error { display: block; background: #fef0f2; color: #c0392b; border: 1px solid #fdd5d9; }
         body.dark-mode .message.error { background: #2a1a1a; color: #e8747a; border: 1px solid #4a2a2a; }
         .message.success { display: block; background: #eaf7ed; color: #27ae60; border: 1px solid #c8e6d0; }
@@ -256,7 +217,6 @@
             border-top: 1px solid var(--border-color);
             transition: border-color 0.3s;
         }
-
         .terms-checkbox {
             display: flex;
             align-items: flex-start;
@@ -264,7 +224,6 @@
             cursor: pointer;
             padding: 4px 0;
         }
-
         .terms-checkbox input[type="checkbox"] {
             width: 18px;
             height: 18px;
@@ -276,19 +235,16 @@
             border: 2px solid var(--input-border);
             transition: all 0.3s;
         }
-
         .terms-checkbox input[type="checkbox"]:checked {
             background-color: var(--text-primary);
             border-color: var(--text-primary);
         }
-
         .terms-checkbox .terms-text {
             font-size: 13px;
             color: var(--text-secondary);
             line-height: 1.5;
             transition: color 0.3s;
         }
-
         .terms-checkbox .terms-text .link {
             color: var(--link-color);
             text-decoration: none;
@@ -297,11 +253,7 @@
             transition: color 0.3s;
             border-bottom: 1px dashed transparent;
         }
-
-        .terms-checkbox .terms-text .link:hover {
-            border-bottom-color: var(--link-color);
-        }
-
+        .terms-checkbox .terms-text .link:hover { border-bottom-color: var(--link-color); }
         .terms-checkbox .terms-text .link-policy {
             color: var(--link-color);
             text-decoration: none;
@@ -310,21 +262,14 @@
             transition: color 0.3s;
             border-bottom: 1px dashed transparent;
         }
-
-        .terms-checkbox .terms-text .link-policy:hover {
-            border-bottom-color: var(--link-color);
-        }
-
+        .terms-checkbox .terms-text .link-policy:hover { border-bottom-color: var(--link-color); }
         .terms-error {
             color: #e74c6f;
             font-size: 12px;
             margin-top: 4px;
             display: none;
         }
-
-        .terms-error.show {
-            display: block;
-        }
+        .terms-error.show { display: block; }
 
         @media (max-width: 480px) {
             .container { padding: 30px 20px; max-width: 100%; }
@@ -368,8 +313,6 @@
                         </svg>
                     </button>
                 </div>
-                
-                <!-- Password Strength - Chỉ hiển thị thanh và text -->
                 <div class="password-strength" id="passwordStrength">
                     <div class="strength-bar">
                         <div class="strength-bar-fill" id="strengthBarFill"></div>
@@ -379,7 +322,6 @@
                         <span class="value" id="strengthValue">--</span>
                     </div>
                 </div>
-                
                 <div class="password-hint">* Mật khẩu phải có ít nhất 6 ký tự</div>
             </div>
 
@@ -420,7 +362,6 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // ===== THEME =====
         function applyTheme() {
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
@@ -437,7 +378,6 @@
                 document.body.classList.add('theme-' + savedTheme);
             }
         }
-
         applyTheme();
 
         window.addEventListener('storage', function(e) {
@@ -446,7 +386,6 @@
             }
         });
 
-        // ===== DOM ELEMENTS =====
         const signupForm = document.getElementById('signupForm');
         const fullNameInput = document.getElementById('fullName');
         const emailInput = document.getElementById('email');
@@ -459,7 +398,6 @@
         const emailStatus = document.getElementById('emailStatus');
         const signupBtn = document.getElementById('signupBtn');
 
-        // Password Strength Elements
         const strengthContainer = document.getElementById('passwordStrength');
         const strengthBarFill = document.getElementById('strengthBarFill');
         const strengthValue = document.getElementById('strengthValue');
@@ -467,7 +405,6 @@
         let usernameCheckTimeout = null;
         let emailCheckTimeout = null;
 
-        // ===== TOGGLE PASSWORD =====
         let isPasswordVisible = false;
         togglePasswordBtn.addEventListener('click', () => {
             isPasswordVisible = !isPasswordVisible;
@@ -483,7 +420,6 @@
                 </svg>`;
         });
 
-        // ===== SHOW MESSAGE =====
         function showMessage(text, type) {
             messageDiv.textContent = text;
             messageDiv.className = 'message ' + type;
@@ -491,12 +427,10 @@
             setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
         }
 
-        // ===== VALIDATE USERNAME =====
         function validateUsername(username) {
             return /^[a-zA-Z0-9]+$/.test(username);
         }
 
-        // ===== CHECK USERNAME EXISTS =====
         async function checkUsernameExists(username) {
             try {
                 const snapshot = await db.ref('users').once('value');
@@ -514,7 +448,6 @@
             }
         }
 
-        // ===== CHECK EMAIL EXISTS =====
         async function checkEmailExists(email) {
             try {
                 const snapshot = await db.ref('users').once('value');
@@ -532,7 +465,6 @@
             }
         }
 
-        // ===== UPDATE STATUS UI =====
         function updateUsernameStatus(status, message, icon) {
             usernameStatus.className = 'input-status ' + status;
             usernameStatus.querySelector('.icon').textContent = icon;
@@ -547,21 +479,15 @@
             emailInput.className = status;
         }
 
-        // ===== PASSWORD STRENGTH - SIMPLIFIED =====
         function checkPasswordStrength(password) {
             let score = 0;
-            
-            // Length check
             if (password.length >= 6) score++;
             if (password.length >= 10) score++;
-            
-            // Character variety
             if (/[a-z]/.test(password)) score++;
             if (/[A-Z]/.test(password)) score++;
             if (/[0-9]/.test(password)) score++;
             if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
             
-            // Normalize score to 0-5
             let strength = 'weak';
             let label = 'Yếu 🔓';
             
@@ -579,20 +505,17 @@
                 label = '--';
             }
 
-            // Update bar
             strengthBarFill.className = 'strength-bar-fill';
             if (password.length > 0) {
                 strengthBarFill.classList.add(strength);
             }
 
-            // Update text
             strengthValue.textContent = label;
             strengthValue.className = 'value';
             if (password.length > 0 && strength !== 'none') {
                 strengthValue.classList.add(strength);
             }
 
-            // Show/hide container
             if (password.length > 0) {
                 strengthContainer.classList.add('show');
             } else {
@@ -602,10 +525,8 @@
             return { score, strength };
         }
 
-        // ===== CHECK USERNAME REAL-TIME =====
         fullNameInput.addEventListener('input', function() {
             const username = this.value.trim();
-            
             clearTimeout(usernameCheckTimeout);
             
             if (username.length === 0) {
@@ -639,10 +560,8 @@
             }, 500);
         });
 
-        // ===== CHECK EMAIL REAL-TIME =====
         emailInput.addEventListener('input', function() {
             const email = this.value.trim();
-            
             clearTimeout(emailCheckTimeout);
             
             if (email.length === 0) {
@@ -671,12 +590,10 @@
             }, 500);
         });
 
-        // ===== PASSWORD INPUT =====
         passwordInput.addEventListener('input', function() {
             checkPasswordStrength(this.value);
         });
 
-        // ===== SUBMIT FORM =====
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -710,14 +627,12 @@
                 return;
             }
 
-            // Kiểm tra username tồn tại
             const usernameExists = await checkUsernameExists(fullName);
             if (usernameExists) {
                 showMessage('❌ Tên người dùng đã được sử dụng!', 'error');
                 return;
             }
 
-            // Kiểm tra email tồn tại
             const emailExists = await checkEmailExists(email);
             if (emailExists) {
                 showMessage('❌ Email đã được sử dụng!', 'error');
@@ -729,7 +644,6 @@
                 return;
             }
 
-            // Kiểm tra độ mạnh mật khẩu
             const strengthResult = checkPasswordStrength(password);
             if (strengthResult.strength === 'weak' && password.length > 0) {
                 const confirmWeak = confirm('⚠️ Mật khẩu của bạn đang ở mức Yếu. Bạn có chắc chắn muốn tiếp tục?');
@@ -748,7 +662,6 @@
                 await db.ref('users/' + userCredential.user.uid).set({
                     user: fullName,
                     email: email,
-                    password: password,
                     balance: 0,
                     blocked: false,
                     isAdmin: email === 'qn781159@gmail.com',
@@ -774,7 +687,6 @@
         });
 
         fullNameInput.focus();
-        
     </script>
 </body>
 </html>
