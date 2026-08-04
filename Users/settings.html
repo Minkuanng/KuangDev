@@ -647,7 +647,7 @@
         function goToProfile() { window.location.href = 'profile.html'; }
         function goToSecurity() { window.location.href = 'security.html'; }
         function goToSettings() { window.location.href = 'settings.html'; }
-        function goToAdmin() { window.location.href = '../Authenticator/admin.html'; }
+        function goToAdmin() { window.location.href = '../Admin/index.html'; }
 
         function logout() {
             if (confirm('Đăng xuất?')) {
@@ -673,7 +673,6 @@
         document.getElementById('autoViewToggle').classList.toggle('active', localStorage.getItem('autoView') !== 'false');
 
         applyTheme();
-        console.log('✅ Settings loaded!');
     </script>
 </body>
 </html>
