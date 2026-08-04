@@ -33,7 +33,6 @@
         body.dark-mode { --bg-body: #1a1a2e; --bg-card: #1a1a2e; --bg-header: #16213e; --text-primary: #e8e8e8; --text-secondary: #8fc1e0; --text-muted: #6a8a9a; --border-color: #2a3a5a; --shadow: 0 2px 10px rgba(0,0,0,0.3); --shadow-popup: 0 8px 30px rgba(0,0,0,0.5); --wallet-bg: #1a2a4a; --hover-bg: #1a2a4a; --toggle-bg: #2a3a5a; --modal-bg: rgba(0,0,0,0.7); --accent: #8fc1e0; }
         body { background: var(--bg-body); min-height: 100vh; transition: var(--transition); }
 
-        /* ===== HEADER GIỐNG INDEX ===== */
         .header { background: var(--bg-header); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; transition: var(--transition); backdrop-filter: blur(12px); }
         .header-left { display: flex; align-items: center; gap: 12px; }
         .logo { display: none; }
@@ -121,7 +120,6 @@
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-bg); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
-
         .modal { background: var(--bg-card); border-radius: 14px; padding: 16px 18px; max-width: 420px; width: 92%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-popup); border: 1px solid var(--border-color); animation: modalIn 0.3s ease; }
         @keyframes modalIn { from { transform: scale(0.95) translateY(-20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 
@@ -521,78 +519,19 @@
             showToast(lang === 'vi' ? '✅ Đã chuyển sang Tiếng Việt!' : '✅ Switched to English!', 'success');
         }
 
-        function checkQuickLogin() {
-            const quickUid = localStorage.getItem('quickLoginUid');
-            const quickToken = localStorage.getItem('quickLoginToken');
-            const quickPending = localStorage.getItem('quickLoginPending');
-            return !!(quickUid && quickToken && quickPending === 'true');
-        }
-
-        async function completeQuickLogin() {
-            const quickUid = localStorage.getItem('quickLoginUid');
-            if (!quickUid) return false;
-            try {
-                await db.ref('presence/' + quickUid).set(true);
-                db.ref('presence/' + quickUid).onDisconnect().set(false);
-                const snap = await db.ref('users/' + quickUid).once('value');
-                const data = snap.val();
-                if (data) {
-                    document.getElementById('balanceAmount').textContent = (data.balance || 0).toLocaleString('vi-VN');
-                    if (data.isAdmin === true) document.getElementById('adminSection').style.display = 'block';
-                }
-                isDataLoaded = true;
-                return true;
-            } catch (error) {
-                console.error('Lỗi quick login:', error);
-                return false;
-            }
-        }
-
+        // ===== AUTH =====
         auth.onAuthStateChanged(async (user) => {
-            if (checkQuickLogin()) {
-                if (await completeQuickLogin()) {
-                    const uid = localStorage.getItem('quickLoginUid');
-                    if (uid) {
-                        db.ref('notifications').on('value', snap => {
-                            const notifs = snap.val();
-                            const list = document.getElementById('notifList');
-                            const dot = document.getElementById('notifDot');
-                            if (notifs) {
-                                const keys = Object.keys(notifs).reverse();
-                                let html = '', hasUnread = false;
-                                keys.forEach(key => {
-                                    const n = notifs[key];
-                                    const isUnread = !n.readBy || !n.readBy[uid];
-                                    if (isUnread) hasUnread = true;
-                                    html += `<div class="notif-item ${isUnread?'unread':''}"><i class="fas fa-bell"></i> ${n.message}<span class="time"><i class="far fa-clock"></i> ${new Date(n.timestamp).toLocaleString('vi-VN')}</span></div>`;
-                                });
-                                list.innerHTML = html;
-                                dot.classList.toggle('show', hasUnread && localStorage.getItem('notifEnabled') !== 'false');
-                            } else {
-                                list.innerHTML = `<div class="empty"><i class="far fa-bell-slash"></i> Chưa có thông báo</div>`;
-                                dot.classList.remove('show');
-                            }
-                        });
-                    }
-                    return;
-                }
-                localStorage.removeItem('quickLoginUid');
-                localStorage.removeItem('quickLoginToken');
-                localStorage.removeItem('quickLoginPending');
+            if (!user) {
                 window.location.replace('../Authenticator/login.html');
                 return;
             }
-            if (!user) {
-                if (!localStorage.getItem('quickLoginUid') || !localStorage.getItem('quickLoginToken')) {
-                    window.location.replace('../Authenticator/login.html');
-                }
-                return;
-            }
-            db.ref('users/' + user.uid + '/isAdmin').once('value', snap => {
-                if (snap.val() === true) document.getElementById('adminSection').style.display = 'block';
-            });
+            db.ref('presence/' + user.uid).set(true);
+            db.ref('presence/' + user.uid).onDisconnect().set(false);
             db.ref('users/' + user.uid + '/balance').on('value', snap => {
                 document.getElementById('balanceAmount').textContent = (snap.val() || 0).toLocaleString('vi-VN');
+            });
+            db.ref('users/' + user.uid + '/isAdmin').once('value', snap => {
+                if (snap.val() === true) document.getElementById('adminSection').style.display = 'block';
             });
             db.ref('notifications').on('value', snap => {
                 const notifs = snap.val();
@@ -630,11 +569,10 @@
         function toggleNotif() {
             document.getElementById('notifPopup').classList.toggle('active');
             const user = auth.currentUser;
-            const uid = user ? user.uid : localStorage.getItem('quickLoginUid');
-            if (uid && localStorage.getItem('autoView') !== 'false') {
+            if (user && localStorage.getItem('autoView') !== 'false') {
                 db.ref('notifications').once('value', snap => {
                     const notifs = snap.val();
-                    if (notifs) Object.keys(notifs).forEach(key => db.ref('notifications/' + key + '/readBy/' + uid).set(true));
+                    if (notifs) Object.keys(notifs).forEach(key => db.ref('notifications/' + key + '/readBy/' + user.uid).set(true));
                 });
                 document.getElementById('notifDot').classList.remove('show');
             }
