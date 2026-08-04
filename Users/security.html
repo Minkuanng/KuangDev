@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảo mật - KuanZGame.Store</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root { 
+            --bg-body: #f0f7ff; --bg-card: #fff; --bg-header: #fff; 
+            --text-primary: #2c5a7a; --text-secondary: #5a8fb5; --text-muted: #8ab3d4; 
+            --border-color: #e3eef9; --shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            --shadow-popup: 0 8px 30px rgba(0,0,0,0.15); --wallet-bg: #f0f7ff; 
+            --hover-bg: #f0f7ff; --toggle-bg: #dce8f2; --toggle-active: #27ae60; 
+            --success: #27ae60; --danger: #e74c6f; --warning: #f39c12;
+            --accent: #3b8fd6; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-galaxy { --bg-body: #0a0a1a; --bg-card: #12122a; --bg-header: #1a1a3e; --text-primary: #c8b8ff; --text-secondary: #8a7aff; --text-muted: #6a5a9a; --border-color: #2a2a5a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #1a1a3e; --hover-bg: #2a2a5a; --toggle-bg: #2a2a5a; --accent: #8a7aff; }
+        .theme-ocean { --bg-body: #0a1628; --bg-card: #0f2a4a; --bg-header: #0d2847; --text-primary: #7fc8ff; --text-secondary: #4a9aff; --text-muted: #3a6a8a; --border-color: #1a3a6a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #0d2847; --hover-bg: #1a3a6a; --toggle-bg: #1a3a6a; --accent: #4a9aff; }
+        .theme-forest { --bg-body: #0a1a0a; --bg-card: #0f2a0f; --bg-header: #0d2a0d; --text-primary: #7fdf7f; --text-secondary: #4abf4a; --text-muted: #3a7a3a; --border-color: #1a4a1a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #0d2a0d; --hover-bg: #1a4a1a; --toggle-bg: #1a4a1a; --accent: #4abf4a; }
+        .theme-sunset { --bg-body: #1a0a0a; --bg-card: #2a120a; --bg-header: #3e1a0a; --text-primary: #ffb87f; --text-secondary: #ff8a4a; --text-muted: #9a6a3a; --border-color: #5a2a1a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #3e1a0a; --hover-bg: #5a2a1a; --toggle-bg: #5a2a1a; --accent: #ff8a4a; }
+        .theme-cherry { --bg-body: #1a0a12; --bg-card: #2a0a16; --bg-header: #3e0a1a; --text-primary: #ff7fa8; --text-secondary: #ff4a7a; --text-muted: #9a3a5a; --border-color: #5a1a2a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #3e1a0a; --hover-bg: #5a1a2a; --toggle-bg: #5a1a2a; --accent: #ff4a7a; }
+        .theme-neon { --bg-body: #0a0a0a; --bg-card: #121212; --bg-header: #1a1a1a; --text-primary: #00ff88; --text-secondary: #00ccff; --text-muted: #666; --border-color: #333; --shadow: 0 2px 10px rgba(0,0,0,0.6); --shadow-popup: 0 8px 30px rgba(0,0,0,0.8); --wallet-bg: #1a1a1a; --hover-bg: #2a2a2a; --toggle-bg: #333; --accent: #00ccff; }
+        .theme-lavender { --bg-body: #1a0a2a; --bg-card: #221a3a; --bg-header: #2a1a3e; --text-primary: #d4a8ff; --text-secondary: #b87aff; --text-muted: #7a5a9a; --border-color: #3a2a5a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #2a1a3e; --hover-bg: #3a2a5a; --toggle-bg: #3a2a5a; --accent: #b87aff; }
+        .theme-mint { --bg-body: #0a1a12; --bg-card: #0f2a1a; --bg-header: #0d2a1a; --text-primary: #7fffd4; --text-secondary: #4abfa0; --text-muted: #3a7a6a; --border-color: #1a4a3a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #0d2a1a; --hover-bg: #1a4a3a; --toggle-bg: #1a4a3a; --accent: #4abfa0; }
+        .theme-coffee { --bg-body: #1a0f0a; --bg-card: #221a12; --bg-header: #2a1a12; --text-primary: #d4b896; --text-secondary: #b8987a; --text-muted: #7a6a5a; --border-color: #3a2a1a; --shadow: 0 2px 10px rgba(0,0,0,0.4); --shadow-popup: 0 8px 30px rgba(0,0,0,0.6); --wallet-bg: #2a1a12; --hover-bg: #3a2a1a; --toggle-bg: #3a2a1a; --accent: #b8987a; }
+        body.dark-mode { --bg-body: #1a1a2e; --bg-card: #1a1a2e; --bg-header: #16213e; --text-primary: #e8e8e8; --text-secondary: #8fc1e0; --text-muted: #6a8a9a; --border-color: #2a3a5a; --shadow: 0 2px 10px rgba(0,0,0,0.3); --shadow-popup: 0 8px 30px rgba(0,0,0,0.5); --wallet-bg: #1a2a4a; --hover-bg: #1a2a4a; --toggle-bg: #2a3a5a; --accent: #8fc1e0; }
+        body { background: var(--bg-body); min-height: 100vh; transition: var(--transition); }
+
+        /* ===== HEADER GIỐNG INDEX ===== */
+        .header { background: var(--bg-header); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; transition: var(--transition); backdrop-filter: blur(12px); }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { display: none; }
+        .menu-icon { cursor: pointer; padding: 6px 8px; border-radius: 8px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: var(--transition); width: 34px; height: 34px; flex-shrink: 0; }
+        .menu-icon:hover { background: var(--hover-bg); transform: scale(1.05); }
+        .menu-icon .bar { display: block; width: 18px; height: 2px; background: var(--text-secondary); border-radius: 2px; transition: var(--transition); flex-shrink: 0; }
+        .menu-icon:hover .bar { background: var(--text-primary); }
+        .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .wallet-container { background: var(--wallet-bg); border: 2px solid var(--border-color); border-radius: 10px; padding: 4px 12px 4px 8px; display: flex; align-items: center; gap: 8px; transition: var(--transition); cursor: default; min-height: 36px; }
+        .wallet-container:hover { border-color: var(--accent); }
+        .wallet-icon-box { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .wallet-icon-box i { color: #fff; font-size: 13px; }
+        .wallet-info { display: flex; flex-direction: column; line-height: 1.2; }
+        .wallet-label { font-size: 8px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .wallet-balance { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .wallet-balance span { font-size: 10px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+
+        .bell-icon { width: 34px; height: 34px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; transition: var(--transition); position: relative; font-size: 15px; color: var(--text-secondary); flex-shrink: 0; }
+        .bell-icon:hover { background: var(--hover-bg); transform: scale(1.05); color: var(--text-primary); }
+        .bell-icon .bell-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: 2px; right: 2px; border: 2px solid var(--bg-header); display: none; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+        .settings-wrapper { position: relative; }
+        .dot-menu { width: 34px; height: 34px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: var(--transition); padding: 6px; flex-shrink: 0; }
+        .dot-menu:hover { background: var(--hover-bg); transform: scale(1.05); }
+        .dot-menu .dot { width: 3.5px; height: 3.5px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
+        .dot-menu:hover .dot { background: var(--text-primary); }
+        .popup { position: absolute; top: 42px; right: 0; background: var(--bg-card); border-radius: 10px; box-shadow: var(--shadow-popup); min-width: 160px; padding: 4px 0; border: 1px solid var(--border-color); opacity: 0; visibility: hidden; transform: translateY(-8px) scale(0.96); transition: var(--transition); z-index: 200; }
+        .popup.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .popup-item { padding: 8px 16px; color: var(--text-primary); font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 10px; border: none; background: none; width: 100%; font-weight: 500; }
+        .popup-item:hover { background: var(--hover-bg); padding-left: 22px; }
+        .popup-divider { height: 1px; background: var(--border-color); margin: 4px 10px; }
+        .popup-item.logout { color: var(--danger); }
+
+        .notif-popup { position: fixed; top: 56px; right: 12px; background: var(--bg-card); border-radius: 10px; box-shadow: var(--shadow-popup); min-width: 260px; max-width: 320px; max-height: 300px; overflow-y: auto; padding: 10px 0; border: 1px solid var(--border-color); z-index: 300; opacity: 0; visibility: hidden; transform: translateY(-8px) scale(0.96); transition: var(--transition); }
+        .notif-popup.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .notif-popup .notif-header { padding: 0 12px 8px; border-bottom: 1px solid var(--border-color); font-weight: 700; color: var(--text-primary); display: flex; justify-content: space-between; font-size: 13px; }
+        .notif-popup .notif-header .close { cursor: pointer; transition: var(--transition); }
+        .notif-popup .notif-header .close:hover { color: var(--danger); }
+        .notif-popup .notif-item { padding: 8px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+        .notif-popup .notif-item i { margin-top: 2px; color: var(--text-secondary); }
+        .notif-popup .notif-item .time { font-size: 9px; color: var(--text-muted); margin-top: 2px; display: block; }
+        .notif-popup .notif-item.unread { background: var(--wallet-bg); border-left: 3px solid var(--danger); }
+        .notif-popup .notif-item.unread i { color: var(--danger); }
+        .notif-popup .empty { padding: 14px; text-align: center; color: var(--text-muted); font-size: 12px; }
+        .notif-popup .empty i { font-size: 20px; display: block; margin-bottom: 6px; }
+
+        .side-menu { position: fixed; top: 0; left: -260px; width: 240px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-popup); z-index: 300; transition: var(--transition); padding: 14px 0; border-right: 1px solid var(--border-color); overflow-y: auto; }
+        .side-menu.active { left: 0; }
+        .side-menu .menu-header { padding: 10px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .side-menu .menu-header .close { cursor: pointer; font-size: 18px; color: var(--text-muted); transition: var(--transition); }
+        .side-menu .menu-header .close:hover { color: var(--danger); transform: rotate(90deg); }
+        .side-menu .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; transition: var(--transition); color: var(--text-primary); border: none; background: none; width: 100%; font-size: 13px; font-weight: 500; }
+        .side-menu .menu-item:hover { background: var(--hover-bg); padding-left: 22px; }
+        .side-menu .menu-item .icon { font-size: 16px; width: 24px; text-align: center; }
+        .side-menu .menu-divider { height: 1px; background: var(--border-color); margin: 4px 12px; }
+        .menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 299; opacity: 0; visibility: hidden; transition: var(--transition); }
+        .menu-overlay.active { opacity: 1; visibility: visible; }
+
+        .content { padding: 14px 16px; max-width: 520px; margin: 0 auto; }
+        .security-card { background: var(--bg-card); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: var(--transition); }
+        .security-card:hover { box-shadow: var(--shadow-popup); }
+        .security-card .shield-icon { text-align: center; font-size: 32px; margin-bottom: 2px; }
+        .security-card h1 { text-align: center; color: var(--text-primary); font-size: 18px; transition: var(--transition); }
+        .security-card .sub { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 14px; transition: var(--transition); }
+
+        .section-title { color: var(--text-primary); font-size: 13px; font-weight: 600; margin: 14px 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 6px; transition: var(--transition); }
+
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; color: var(--text-muted); font-size: 11px; font-weight: 500; margin-bottom: 2px; transition: var(--transition); }
+        .form-group input { width: 100%; padding: 6px 10px; border: 2px solid var(--border-color); border-radius: 6px; font-size: 13px; background: var(--wallet-bg); color: var(--text-primary); transition: var(--transition); }
+        .form-group input:focus { outline: none; border-color: var(--text-secondary); box-shadow: 0 0 0 3px rgba(90,143,181,0.1); }
+        .btn-change { width: 100%; padding: 8px; background: linear-gradient(135deg, #8fc1e0, #5a8fb5); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .btn-change:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(90,143,181,0.3); }
+        .btn-change:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .message { padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 8px; display: none; }
+        .message.error { display: block; background: #fef0f2; color: #c0392b; border: 1px solid #fdd5d9; }
+        body.dark-mode .message.error { background: #2a1a1a; color: #e8747a; border: 1px solid #4a2a2a; }
+        .message.success { display: block; background: #d4edda; color: #155724; border: 1px solid #c8e6d0; }
+        body.dark-mode .message.success { background: #1a2a1a; color: #7ab87a; border: 1px solid #2a4a2a; }
+
+        .twofa-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color); transition: var(--transition); cursor: pointer; }
+        .twofa-row:hover { background: var(--hover-bg); border-radius: 6px; padding-left: 6px; padding-right: 6px; }
+        .twofa-row .left { display: flex; align-items: center; gap: 10px; }
+        .twofa-row .left .icon-box { width: 32px; height: 32px; border-radius: 8px; background: var(--wallet-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; border: 1px solid var(--border-color); }
+        .twofa-row .left .info .title { color: var(--text-primary); font-size: 13px; font-weight: 500; }
+        .twofa-row .left .info .desc { color: var(--text-muted); font-size: 11px; }
+        .toggle-switch { width: 38px; height: 20px; background: var(--toggle-bg); border-radius: 10px; position: relative; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
+        .toggle-switch.active { background: var(--toggle-active); }
+        .toggle-switch .knob { width: 14px; height: 14px; background: #fff; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: var(--transition); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .toggle-switch.active .knob { left: 21px; }
+        .twofa-status { font-size: 11px; font-weight: 500; padding: 1px 10px; border-radius: 10px; }
+        .twofa-status.on { color: var(--success); background: #d4edda; }
+        .twofa-status.off { color: var(--danger); background: #fef0f2; }
+        body.dark-mode .twofa-status.on { background: #1a3a2a; }
+        body.dark-mode .twofa-status.off { background: #3a1a2a; }
+
+        .secret-box { background: var(--wallet-bg); padding: 10px 14px; border-radius: 8px; border: 2px solid var(--border-color); margin: 8px 0 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: var(--transition); }
+        .secret-box:hover { border-color: var(--accent); }
+        .secret-box .secret-key { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; letter-spacing: 2px; color: var(--text-primary); word-break: break-all; }
+        .secret-box .copy-btn { padding: 4px 12px; background: var(--text-secondary); color: #fff; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); flex-shrink: 0; display: flex; align-items: center; gap: 4px; }
+        .secret-box .copy-btn:hover { transform: scale(1.05); opacity: 0.9; }
+        .secret-box .copy-btn.copied { background: var(--success); }
+
+        .otp-section { background: var(--wallet-bg); border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); margin: 6px 0; transition: var(--transition); }
+        .otp-section .otp-label { color: var(--text-muted); font-size: 11px; font-weight: 500; margin-bottom: 6px; display: block; }
+        .otp-input-row { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .otp-input-row input { padding: 8px 12px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 18px; font-weight: 700; background: var(--bg-card); color: var(--text-primary); text-align: center; letter-spacing: 6px; width: 150px; height: 44px; transition: var(--transition); }
+        .otp-input-row input:focus { outline: none; border-color: var(--text-secondary); box-shadow: 0 0 0 3px rgba(90,143,181,0.1); }
+        .otp-input-row input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(231,76,111,0.15); }
+        .otp-input-row input.success { border-color: var(--success); box-shadow: 0 0 0 3px rgba(39,174,96,0.15); }
+        .otp-input-row .paste-btn { padding: 6px 12px; background: var(--wallet-bg); color: var(--text-secondary); border: 2px solid var(--border-color); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
+        .otp-input-row .paste-btn:hover { background: var(--hover-bg); border-color: var(--text-secondary); }
+
+        .error-msg { color: var(--danger); font-size: 12px; text-align: center; display: none; margin-top: 4px; }
+        .error-msg.show { display: block; }
+        .attempts { text-align: center; color: var(--text-muted); font-size: 11px; margin-top: 4px; }
+
+        .modal-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .modal-actions button { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .modal-actions .btn-confirm { background: linear-gradient(135deg, #8fc1e0, #5a8fb5); color: #fff; }
+        .modal-actions .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(90,143,181,0.3); }
+        .modal-actions .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .modal-actions .btn-cancel { background: var(--wallet-bg); color: var(--text-muted); border: 1px solid var(--border-color); }
+        .modal-actions .btn-cancel:hover { background: var(--hover-bg); }
+        .modal-actions .btn-danger { background: var(--danger); color: #fff; }
+        .modal-actions .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(231,76,111,0.3); }
+
+        .device-box { background: var(--wallet-bg); border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); transition: var(--transition); }
+        .device-box:hover { border-color: var(--accent); }
+        .device-box .device-item { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .device-box .device-item:last-child { border-bottom: none; }
+        .device-box .device-item .label { color: var(--text-muted); font-weight: 500; font-size: 11px; }
+        .device-box .device-item .value { font-weight: 500; font-size: 12px; }
+
+        .btn-back { padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); width: 100%; margin-top: 12px; }
+        .btn-back:hover { background: var(--hover-bg); border-color: var(--text-secondary); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); z-index: 500; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-card); border-radius: 14px; padding: 16px 18px; max-width: 400px; width: 92%; box-shadow: var(--shadow-popup); border: 1px solid var(--border-color); animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { transform: scale(0.95) translateY(-20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        .modal h3 { color: var(--text-primary); text-align: center; font-size: 18px; margin-bottom: 4px; transition: var(--transition); }
+        .modal .modal-desc { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 12px; transition: var(--transition); }
+
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-body); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: 0.4s; }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; display: none !important; }
+        .loading-spinner { width: 36px; height: 36px; border: 4px solid var(--border-color); border-radius: 50%; border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: var(--text-primary); font-size: 13px; font-weight: 500; }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 6px 16px; background: var(--bg-card); color: var(--text-primary); border-radius: 8px; box-shadow: var(--shadow-popup); border: 1px solid var(--border-color); z-index: 999; opacity: 0; transition: 0.4s; font-weight: 500; font-size: 11px; pointer-events: none; }
+        .toast.show { opacity: 1; }
+        .toast.success { border-color: var(--success); color: var(--success); }
+        .toast.error { border-color: var(--danger); color: var(--danger); }
+
+        @media (max-width: 600px) { 
+            .header { padding: 6px 10px; } 
+            .content { padding: 8px 10px; } 
+            .security-card { padding: 12px 14px; } 
+            .secret-box { flex-direction: column; align-items: stretch; text-align: center; padding: 10px; } 
+            .secret-box .copy-btn { margin-top: 4px; justify-content: center; } 
+            .otp-input-row input { width: 120px; height: 38px; font-size: 16px; letter-spacing: 4px; } 
+            .wallet-container { padding: 3px 8px 3px 6px; min-height: 30px; }
+            .wallet-icon-box { width: 22px; height: 22px; }
+            .wallet-icon-box i { font-size: 10px; }
+            .wallet-balance { font-size: 11px; }
+            .wallet-label { font-size: 7px; }
+            .menu-icon { width: 28px; height: 28px; padding: 4px 6px; }
+            .menu-icon .bar { width: 14px; height: 2px; }
+            .bell-icon { width: 28px; height: 28px; font-size: 13px; }
+            .dot-menu { width: 28px; height: 28px; }
+            .notif-popup { right: 6px; left: 6px; min-width: auto; }
+            .modal { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">⏳ Đang tải dữ liệu...</div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header"><span style="font-weight:700;color:var(--text-primary);"><i class="fas fa-bars"></i> Menu</span><span class="close" onclick="closeMenu()"><i class="fas fa-times"></i></span></div>
+        <button class="menu-item" onclick="goHome()"><span class="icon"><i class="fas fa-home"></i></span>Trang chủ</button>
+        <button class="menu-item" onclick="goHistory()"><span class="icon"><i class="fas fa-history"></i></span>Lịch sử</button>
+        <button class="menu-item" onclick="goTopup()"><span class="icon"><i class="fas fa-coins"></i></span>Nạp tiền</button>
+        <div class="menu-divider"></div>
+        <button class="menu-item" onclick="goSupport()"><span class="icon"><i class="fas fa-headset"></i></span>Hỗ trợ</button>
+    </div>
+
+    <header class="header">
+        <div class="header-left">
+            <div class="menu-icon" onclick="toggleMenu()">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <div class="logo"></div>
+        </div>
+        <div class="header-right">
+            <div class="wallet-container">
+                <div class="wallet-icon-box"><i class="fas fa-wallet"></i></div>
+                <div class="wallet-info">
+                    <span class="wallet-label">Số dư</span>
+                    <span class="wallet-balance"><span id="balanceAmount">0</span> <span>VND</span></span>
+                </div>
+            </div>
+            <div class="bell-icon" onclick="toggleNotif()"><div class="bell-dot" id="notifDot"></div><i class="fas fa-bell"></i></div>
+            <div class="settings-wrapper">
+                <div class="dot-menu" onclick="togglePopup(event)">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div class="popup" id="settingsPopup">
+                    <button class="popup-item" onclick="goToProfile()"><i class="fas fa-user"></i> Thông tin</button>
+                    <button class="popup-item" onclick="goToSecurity()"><i class="fas fa-shield-alt"></i> Bảo mật</button>
+                    <button class="popup-item" onclick="goToSettings()"><i class="fas fa-cog"></i> Cài đặt</button>
+                    <div class="popup-divider"></div>
+                    <button class="popup-item logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="notif-popup" id="notifPopup">
+        <div class="notif-header"><span><i class="fas fa-bullhorn"></i> Thông báo</span><span class="close" onclick="toggleNotif()"><i class="fas fa-times"></i></span></div>
+        <div id="notifList"><div class="empty"><i class="far fa-bell-slash"></i> Chưa có thông báo</div></div>
+    </div>
+
+    <div class="content">
+        <div class="security-card">
+            <div class="shield-icon"><i class="fas fa-shield-halved"></i></div>
+            <h1>Bảo mật</h1>
+            <p class="sub">Quản lý bảo mật tài khoản của bạn</p>
+            <div id="message" class="message"></div>
+
+            <div class="section-title"><i class="fas fa-key"></i> Đổi mật khẩu</div>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Mật khẩu hiện tại</label>
+                    <input type="password" id="currentPassword" placeholder="Nhập mật khẩu cũ" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Mật khẩu mới</label>
+                    <input type="password" id="newPassword" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-check-double"></i> Xác nhận mật khẩu</label>
+                    <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+                </div>
+                <button type="submit" class="btn-change"><i class="fas fa-sync"></i> Cập nhật</button>
+            </form>
+
+            <div class="section-title"><i class="fas fa-shield"></i> Xác thực 2 lớp</div>
+            <div class="twofa-row" onclick="toggleTwoFA()">
+                <div class="left">
+                    <div class="icon-box"><i class="fas fa-qrcode"></i></div>
+                    <div class="info">
+                        <div class="title">Google Authenticator</div>
+                        <div class="desc" id="twofaStatusDesc">Chưa kích hoạt</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="twofa-status off" id="twofaStatusBadge">Tắt</span>
+                    <div class="toggle-switch" id="twofaToggle" onclick="event.stopPropagation(); toggleTwoFA()">
+                        <div class="knob"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="twofaModal">
+                <div class="modal">
+                    <h3><i class="fas fa-qrcode"></i> <span id="modalTitle">Xác thực 2 lớp</span></h3>
+                    <p class="modal-desc" id="modalDesc">Quét mã với Google Authenticator hoặc nhập thủ công</p>
+                    <div class="secret-box">
+                        <span class="secret-key" id="secretKeyDisplay">Đang tạo...</span>
+                        <button class="copy-btn" id="copyBtn" onclick="copySecret()"><i class="fas fa-copy"></i> Sao chép</button>
+                    </div>
+                    <div class="otp-section">
+                        <span class="otp-label"><i class="fas fa-mobile-screen"></i> Nhập mã OTP 6 số</span>
+                        <div class="otp-input-row">
+                            <input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off" />
+                            <button class="paste-btn" onclick="pasteOTP()"><i class="fas fa-paste"></i> Dán</button>
+                        </div>
+                    </div>
+                    <div class="error-msg" id="otpError"><i class="fas fa-times-circle"></i> Mã OTP không đúng! Vui lòng thử lại.</div>
+                    <div class="attempts">Còn <span id="attemptCount">3</span> lần thử</div>
+                    <div class="modal-actions">
+                        <button class="btn-confirm" id="btnVerifyOTP" onclick="verifyOTP()"><i class="fas fa-check"></i> Xác nhận</button>
+                        <button class="btn-cancel" onclick="closeOTPModal()"><i class="fas fa-times"></i> Hủy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="twofaOffModal">
+                <div class="modal">
+                    <h3><i class="fas fa-unlock"></i> Tắt xác thực 2 lớp</h3>
+                    <p class="modal-desc">Nhập mã OTP để xác nhận tắt</p>
+                    <div class="otp-section">
+                        <span class="otp-label"><i class="fas fa-mobile-screen"></i> Nhập mã OTP 6 số</span>
+                        <div class="otp-input-row">
+                            <input type="text" id="otpOffInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="off" />
+                            <button class="paste-btn" onclick="pasteOTPOff()"><i class="fas fa-paste"></i> Dán</button>
+                        </div>
+                    </div>
+                    <div class="error-msg" id="otpOffError"><i class="fas fa-times-circle"></i> Mã OTP không đúng!</div>
+                    <div class="attempts">Còn <span id="offAttemptCount">3</span> lần thử</div>
+                    <div class="modal-actions">
+                        <button class="btn-danger" id="btnTurnOff" onclick="turnOff2FA()"><i class="fas fa-unlock"></i> Tắt</button>
+                        <button class="btn-cancel" onclick="closeTwoFAOff()"><i class="fas fa-times"></i> Đóng</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="fas fa-laptop"></i> Thiết bị đăng nhập</div>
+            <div class="device-box">
+                <div class="device-item"><span class="label"><i class="fas fa-globe"></i> IP Address</span><span class="value" id="userIP">Đang lấy...</span></div>
+                <div class="device-item"><span class="label"><i class="fas fa-desktop"></i> Trình duyệt</span><span class="value" id="userBrowser">Đang lấy...</span></div>
+                <div class="device-item"><span class="label"><i class="fas fa-clock"></i> Lần đăng nhập cuối</span><span class="value" id="lastLogin">Đang lấy...</span></div>
+            </div>
+
+            <button class="btn-back" onclick="goToSettings()"><i class="fas fa-arrow-left"></i> Quay lại cài đặt</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== SIMPLE OTP CLASS =====
+        class SimpleOTP {
+            constructor() {
+                this.authenticator = {
+                    check: (token, secret) => this.verifyTOTP(token, secret),
+                    generate: (secret) => this.generateTOTP(secret)
+                };
+            }
+            base32Decode(base32) {
+                const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                const bytes = []; let bits = 0, value = 0;
+                for (let i = 0; i < base32.length; i++) {
+                    const idx = alphabet.indexOf(base32[i].toUpperCase());
+                    if (idx === -1) continue;
+                    value = (value << 5) | idx; bits += 5;
+                    if (bits >= 8) { bytes.push((value >> (bits - 8)) & 0xFF); bits -= 8; }
+                }
+                return new Uint8Array(bytes);
+            }
+            async hmacSha1(key, data) {
+                const keyData = typeof key === 'string' ? this.base32Decode(key) : key;
+                const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+                return new Uint8Array(await crypto.subtle.sign('HMAC', cryptoKey, data));
+            }
+            dynamicTruncation(hmac) {
+                const offset = hmac[hmac.length - 1] & 0xF;
+                const binary = ((hmac[offset] & 0x7F) << 24) | ((hmac[offset + 1] & 0xFF) << 16) | ((hmac[offset + 2] & 0xFF) << 8) | (hmac[offset + 3] & 0xFF);
+                return binary % 1000000;
+            }
+            async generateHOTP(secret, counter) {
+                const counterBytes = new Uint8Array(8);
+                for (let i = 7; i >= 0; i--) { counterBytes[i] = counter & 0xFF; counter = counter >> 8; }
+                const hmac = await this.hmacSha1(secret, counterBytes);
+                return String(this.dynamicTruncation(hmac)).padStart(6, '0');
+            }
+            async generateTOTP(secret, window = 0) {
+                return await this.generateHOTP(secret, Math.floor(Date.now() / 30000) + window);
+            }
+            async verifyTOTP(token, secret) {
+                if (!token || token.length !== 6 || !secret || secret.length < 10) return false;
+                try {
+                    for (const w of [0, -1, 1]) {
+                        if (await this.generateTOTP(secret, w) === token) return true;
+                    }
+                    return false;
+                } catch { return false; }
+            }
+            generateSecret() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                let secret = '';
+                for (let i = 0; i < 16; i++) secret += chars.charAt(Math.floor(Math.random() * chars.length));
+                return secret;
+            }
+        }
+
+        // ===== FIREBASE =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPDDRt520fSynXCGrr2aF-KvpnS_ZuIm8",
+            authDomain: "shop-c6777.firebaseapp.com",
+            databaseURL: "https://shop-c6777-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "shop-c6777",
+            storageBucket: "shop-c6777.firebasestorage.app",
+            messagingSenderId: "43186563268",
+            appId: "1:43186563268:web:0d392ba57039a919670191"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        const otp = new SimpleOTP();
+        const authenticator = otp.authenticator;
+
+        let currentUser = null, isDataLoaded = false, is2FAEnabled = false, twofaSecret = '';
+        let isVerifying = false, isTurningOff = false, verifyAttempts = 3, offAttempts = 3;
+
+        function showToast(msg, type = '') {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast ' + type;
+            el.classList.add('show');
+            clearTimeout(el.timeout);
+            el.timeout = setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark';
+            document.body.classList.toggle('dark-mode', isDark);
+            const theme = localStorage.getItem('theme_name') || 'default';
+            document.body.className = document.body.className.replace(/theme-\w+/g, '');
+            if (theme !== 'default') document.body.classList.add('theme-' + theme);
+        }
+        applyTheme();
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+        function showLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.classList.remove('hidden');
+        }
+
+        function updateTwoFAStatus() {
+            const toggle = document.getElementById('twofaToggle');
+            if (!toggle) return;
+            const isActive = toggle.classList.contains('active');
+            const desc = document.getElementById('twofaStatusDesc');
+            const badge = document.getElementById('twofaStatusBadge');
+            if (isActive) {
+                if (desc) { desc.textContent = 'Đã kích hoạt'; desc.style.color = 'var(--success)'; }
+                if (badge) { badge.textContent = 'Bật'; badge.className = 'twofa-status on'; }
+            } else {
+                if (desc) { desc.textContent = 'Chưa kích hoạt'; desc.style.color = 'var(--text-muted)'; }
+                if (badge) { badge.textContent = 'Tắt'; badge.className = 'twofa-status off'; }
+            }
+        }
+
+        function checkQuickLogin() {
+            const quickUid = localStorage.getItem('quickLoginUid');
+            const quickToken = localStorage.getItem('quickLoginToken');
+            const quickPending = localStorage.getItem('quickLoginPending');
+            return !!(quickUid && quickToken && quickPending === 'true');
+        }
+
+        async function completeQuickLogin() {
+            const quickUid = localStorage.getItem('quickLoginUid');
+            if (!quickUid || !localStorage.getItem('quickLoginToken')) return false;
+            try {
+                const snap = await db.ref('users/' + quickUid).once('value');
+                const userData = snap.val();
+                if (!userData || userData.blocked === true) {
+                    localStorage.removeItem('quickLoginUid'); localStorage.removeItem('quickLoginToken'); localStorage.removeItem('quickLoginPending');
+                    return false;
+                }
+                await db.ref('presence/' + quickUid).set(true);
+                db.ref('presence/' + quickUid).onDisconnect().set(false);
+                document.getElementById('balanceAmount').textContent = (userData.balance || 0).toLocaleString('vi-VN');
+                document.getElementById('lastLogin').textContent = userData.lastLogin ? new Date(userData.lastLogin).toLocaleString('vi-VN') : 'Lần đầu đăng nhập';
+                if (userData.twofaEnabled === true) {
+                    document.getElementById('twofaToggle').classList.add('active');
+                    is2FAEnabled = true;
+                } else {
+                    document.getElementById('twofaToggle').classList.remove('active');
+                    is2FAEnabled = false;
+                }
+                updateTwoFAStatus();
+                db.ref('notifications').on('value', snap => {
+                    const notifs = snap.val();
+                    const list = document.getElementById('notifList');
+                    const dot = document.getElementById('notifDot');
+                    if (notifs) {
+                        const keys = Object.keys(notifs).reverse();
+                        let html = '', hasUnread = false;
+                        keys.forEach(key => {
+                            const n = notifs[key];
+                            const isUnread = !n.readBy || !n.readBy[quickUid];
+                            if (isUnread) hasUnread = true;
+                            html += `<div class="notif-item ${isUnread?'unread':''}"><i class="fas fa-bell"></i> ${n.message}<span class="time"><i class="far fa-clock"></i> ${new Date(n.timestamp).toLocaleString('vi-VN')}</span></div>`;
+                        });
+                        list.innerHTML = html;
+                        dot.classList.toggle('show', hasUnread && localStorage.getItem('notifEnabled') !== 'false');
+                    } else {
+                        list.innerHTML = `<div class="empty"><i class="far fa-bell-slash"></i> Chưa có thông báo</div>`;
+                        dot.classList.remove('show');
+                    }
+                });
+                isDataLoaded = true;
+                hideLoading();
+                return true;
+            } catch (error) {
+                console.error('Lỗi quick login:', error);
+                return false;
+            }
+        }
+
+        // ===== 2FA FUNCTIONS =====
+        function toggleTwoFA() {
+            const user = auth.currentUser;
+            const toggle = document.getElementById('twofaToggle');
+            if (!toggle) return;
+            if (toggle.classList.contains('active')) {
+                offAttempts = 3;
+                document.getElementById('otpOffInput').value = '';
+                document.getElementById('otpOffError').classList.remove('show');
+                document.getElementById('offAttemptCount').textContent = offAttempts;
+                document.getElementById('twofaOffModal').classList.add('active');
+                setTimeout(() => document.getElementById('otpOffInput').focus(), 200);
+                return;
+            }
+            const uid = user ? user.uid : localStorage.getItem('quickLoginUid');
+            if (!uid) { showToast('Vui lòng đăng nhập!', 'error'); return; }
+            db.ref('users/' + uid + '/twofaEnabled').once('value').then((snap) => {
+                if (snap.val() === true) { toggle.classList.add('active'); updateTwoFAStatus(); return; }
+                twofaSecret = otp.generateSecret();
+                document.getElementById('secretKeyDisplay').textContent = twofaSecret;
+                document.getElementById('otpInput').value = '';
+                document.getElementById('otpError').classList.remove('show');
+                document.getElementById('otpInput').classList.remove('error', 'success');
+                verifyAttempts = 3;
+                document.getElementById('attemptCount').textContent = verifyAttempts;
+                document.getElementById('twofaModal').classList.add('active');
+                setTimeout(() => document.getElementById('otpInput').focus(), 200);
+            });
+        }
+
+        function copySecret() {
+            const secret = document.getElementById('secretKeyDisplay').textContent;
+            const btn = document.getElementById('copyBtn');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(secret).then(() => {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Sao chép'; btn.classList.remove('copied'); }, 2000);
+                });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = secret;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Sao chép'; btn.classList.remove('copied'); }, 2000);
+            }
+        }
+
+        function pasteOTP() {
+            if (navigator.clipboard) {
+                navigator.clipboard.readText().then(text => {
+                    const cleaned = text.replace(/\D/g, '').slice(0, 6);
+                    if (cleaned.length === 6) { document.getElementById('otpInput').value = cleaned; verifyOTP(); }
+                    else { document.getElementById('otpError').textContent = '❌ Vui lòng dán đúng mã OTP 6 số!'; document.getElementById('otpError').classList.add('show'); }
+                }).catch(() => showToast('Không thể đọc clipboard.', 'error'));
+            } else showToast('Trình duyệt không hỗ trợ dán.', 'error');
+        }
+
+        function pasteOTPOff() {
+            if (navigator.clipboard) {
+                navigator.clipboard.readText().then(text => {
+                    const cleaned = text.replace(/\D/g, '').slice(0, 6);
+                    if (cleaned.length === 6) { document.getElementById('otpOffInput').value = cleaned; turnOff2FA(); }
+                    else { document.getElementById('otpOffError').textContent = '❌ Vui lòng dán đúng mã OTP 6 số!'; document.getElementById('otpOffError').classList.add('show'); }
+                }).catch(() => showToast('Không thể đọc clipboard.', 'error'));
+            } else showToast('Trình duyệt không hỗ trợ dán.', 'error');
+        }
+
+        async function verifyOTP() {
+            if (isVerifying) return;
+            const otpInput = document.getElementById('otpInput');
+            const otpValue = otpInput.value.trim();
+            if (otpValue.length !== 6 || !/^\d{6}$/.test(otpValue)) {
+                document.getElementById('otpError').textContent = '❌ Vui lòng nhập đúng mã OTP 6 số!';
+                document.getElementById('otpError').classList.add('show');
+                otpInput.classList.add('error');
+                return;
+            }
+            isVerifying = true;
+            const btn = document.getElementById('btnVerifyOTP');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xác thực...';
+            try {
+                const user = auth.currentUser;
+                let uid = user ? user.uid : localStorage.getItem('quickLoginUid');
+                if (!uid) { showToast('Vui lòng đăng nhập lại!', 'error'); isVerifying = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Xác nhận'; return; }
+                let secret = twofaSecret;
+                if (!secret) { const snap = await db.ref('users/' + uid + '/twofaSecret').once('value'); secret = snap.val(); }
+                if (!secret) { document.getElementById('otpError').textContent = '❌ Không tìm thấy secret key!'; document.getElementById('otpError').classList.add('show'); isVerifying = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Xác nhận'; return; }
+                const isValid = await authenticator.check(otpValue, secret);
+                if (isValid) {
+                    await db.ref('users/' + uid).update({ twofaEnabled: true, twofaSecret: secret });
+                    otpInput.classList.remove('error'); otpInput.classList.add('success');
+                    document.getElementById('otpError').classList.remove('show');
+                    btn.innerHTML = '<i class="fas fa-check"></i> Thành công';
+                    showToast('✅ Đã kích hoạt xác thực 2 lớp thành công!', 'success');
+                    document.getElementById('twofaToggle').classList.add('active');
+                    is2FAEnabled = true;
+                    updateTwoFAStatus();
+                    closeOTPModal();
+                } else {
+                    verifyAttempts--;
+                    document.getElementById('attemptCount').textContent = verifyAttempts;
+                    otpInput.classList.add('error');
+                    document.getElementById('otpError').textContent = `❌ Mã OTP không đúng! Còn ${verifyAttempts} lần thử.`;
+                    document.getElementById('otpError').classList.add('show');
+                    if (verifyAttempts <= 0) {
+                        document.getElementById('otpError').textContent = '❌ Bạn đã nhập sai quá nhiều lần!';
+                        setTimeout(() => { closeOTPModal(); isVerifying = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Xác nhận'; }, 2000);
+                        return;
+                    }
+                    otpInput.value = ''; otpInput.focus();
+                }
+            } catch (error) { showToast('❌ Lỗi: ' + error.message, 'error'); }
+            isVerifying = false;
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Xác nhận';
+        }
+
+        async function turnOff2FA() {
+            if (isTurningOff) return;
+            const otpInput = document.getElementById('otpOffInput');
+            const otpValue = otpInput.value.trim();
+            if (otpValue.length !== 6 || !/^\d{6}$/.test(otpValue)) {
+                document.getElementById('otpOffError').textContent = '❌ Vui lòng nhập đúng mã OTP 6 số!';
+                document.getElementById('otpOffError').classList.add('show');
+                otpInput.classList.add('error');
+                return;
+            }
+            isTurningOff = true;
+            const btn = document.getElementById('btnTurnOff');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xác thực...';
+            try {
+                const user = auth.currentUser;
+                let uid = user ? user.uid : localStorage.getItem('quickLoginUid');
+                if (!uid) { showToast('Vui lòng đăng nhập lại!', 'error'); isTurningOff = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock"></i> Tắt'; return; }
+                const snap = await db.ref('users/' + uid + '/twofaSecret').once('value');
+                const secret = snap.val();
+                if (!secret) { document.getElementById('otpOffError').textContent = '❌ Không tìm thấy secret key!'; document.getElementById('otpOffError').classList.add('show'); isTurningOff = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock"></i> Tắt'; return; }
+                const isValid = await authenticator.check(otpValue, secret);
+                if (isValid) {
+                    await db.ref('users/' + uid).update({ twofaEnabled: false, twofaSecret: null });
+                    otpInput.classList.remove('error'); otpInput.classList.add('success');
+                    document.getElementById('otpOffError').classList.remove('show');
+                    btn.innerHTML = '<i class="fas fa-check"></i> Thành công';
+                    showToast('✅ Đã tắt xác thực 2 lớp!', 'success');
+                    document.getElementById('twofaToggle').classList.remove('active');
+                    is2FAEnabled = false;
+                    updateTwoFAStatus();
+                    closeTwoFAOff();
+                } else {
+                    offAttempts--;
+                    document.getElementById('offAttemptCount').textContent = offAttempts;
+                    otpInput.classList.add('error');
+                    document.getElementById('otpOffError').textContent = `❌ Mã OTP không đúng! Còn ${offAttempts} lần thử.`;
+                    document.getElementById('otpOffError').classList.add('show');
+                    if (offAttempts <= 0) {
+                        document.getElementById('otpOffError').textContent = '❌ Bạn đã nhập sai quá nhiều lần!';
+                        setTimeout(() => { closeTwoFAOff(); isTurningOff = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock"></i> Tắt'; }, 2000);
+                        return;
+                    }
+                    otpInput.value = ''; otpInput.focus();
+                }
+            } catch (error) { showToast('❌ Lỗi: ' + error.message, 'error'); }
+            isTurningOff = false;
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock"></i> Tắt';
+        }
+
+        function closeOTPModal() {
+            document.getElementById('twofaModal').classList.remove('active');
+            document.getElementById('otpInput').value = '';
+            document.getElementById('otpError').classList.remove('show');
+            isVerifying = false;
+            document.getElementById('btnVerifyOTP').disabled = false;
+            document.getElementById('btnVerifyOTP').innerHTML = '<i class="fas fa-check"></i> Xác nhận';
+        }
+
+        function closeTwoFAOff() {
+            document.getElementById('twofaOffModal').classList.remove('active');
+            document.getElementById('otpOffInput').value = '';
+            document.getElementById('otpOffError').classList.remove('show');
+            isTurningOff = false;
+            document.getElementById('btnTurnOff').disabled = false;
+            document.getElementById('btnTurnOff').innerHTML = '<i class="fas fa-unlock"></i> Tắt';
+        }
+
+        // ===== AUTH =====
+        auth.onAuthStateChanged(async (user) => {
+            if (isDataLoaded) return;
+            if (checkQuickLogin()) {
+                if (await completeQuickLogin()) return;
+                localStorage.removeItem('quickLoginUid'); localStorage.removeItem('quickLoginToken'); localStorage.removeItem('quickLoginPending');
+                window.location.replace('../Authenticator/login.html');
+                return;
+            }
+            if (!user) { window.location.replace('../Authenticator/login.html'); return; }
+            currentUser = user;
+            db.ref('presence/' + user.uid).set(true);
+            db.ref('presence/' + user.uid).onDisconnect().set(false);
+            db.ref('users/' + user.uid + '/balance').on('value', snap => {
+                document.getElementById('balanceAmount').textContent = (snap.val() || 0).toLocaleString('vi-VN');
+            });
+            db.ref('users/' + user.uid + '/twofaEnabled').on('value', snap => {
+                const enabled = snap.val() === true;
+                document.getElementById('twofaToggle').classList.toggle('active', enabled);
+                is2FAEnabled = enabled;
+                updateTwoFAStatus();
+            });
+            db.ref('users/' + user.uid + '/lastLogin').on('value', snap => {
+                document.getElementById('lastLogin').textContent = snap.val() ? new Date(snap.val()).toLocaleString('vi-VN') : 'Lần đầu đăng nhập';
+            });
+            db.ref('notifications').on('value', snap => {
+                const notifs = snap.val();
+                const list = document.getElementById('notifList');
+                const dot = document.getElementById('notifDot');
+                if (notifs) {
+                    const keys = Object.keys(notifs).reverse();
+                    let html = '', hasUnread = false;
+                    keys.forEach(key => {
+                        const n = notifs[key];
+                        const isUnread = !n.readBy || !n.readBy[user.uid];
+                        if (isUnread) hasUnread = true;
+                        html += `<div class="notif-item ${isUnread?'unread':''}"><i class="fas fa-bell"></i> ${n.message}<span class="time"><i class="far fa-clock"></i> ${new Date(n.timestamp).toLocaleString('vi-VN')}</span></div>`;
+                    });
+                    list.innerHTML = html;
+                    dot.classList.toggle('show', hasUnread && localStorage.getItem('notifEnabled') !== 'false');
+                } else {
+                    list.innerHTML = `<div class="empty"><i class="far fa-bell-slash"></i> Chưa có thông báo</div>`;
+                    dot.classList.remove('show');
+                }
+            });
+            if (!isDataLoaded) { isDataLoaded = true; hideLoading(); }
+        });
+
+        // ===== CHANGE PASSWORD =====
+        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const msg = document.getElementById('message');
+            if (newPass.length < 6) { msg.textContent = '❌ Mật khẩu tối thiểu 6 ký tự!'; msg.className = 'message error'; return; }
+            if (newPass !== confirm) { msg.textContent = '❌ Mật khẩu không khớp!'; msg.className = 'message error'; return; }
+            const btn = document.querySelector('.btn-change');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    if (localStorage.getItem('quickLoginUid')) {
+                        showToast('⚠️ Bạn đang đăng nhập nhanh. Vui lòng đăng nhập bằng email để đổi mật khẩu.', 'error');
+                        btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync"></i> Cập nhật';
+                        return;
+                    }
+                    showToast('Vui lòng đăng nhập lại!', 'error');
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync"></i> Cập nhật';
+                    return;
+                }
+                const credential = firebase.auth.EmailAuthProvider.credential(user.email, current);
+                await user.reauthenticateWithCredential(credential);
+                await user.updatePassword(newPass);
+                msg.textContent = '✅ Đổi mật khẩu thành công!';
+                msg.className = 'message success';
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                showToast('✅ Đổi mật khẩu thành công!', 'success');
+            } catch (error) {
+                let err = '❌ Lỗi: ';
+                if (error.code === 'auth/wrong-password') err += 'Mật khẩu hiện tại sai!';
+                else err += error.message;
+                msg.textContent = err;
+                msg.className = 'message error';
+                showToast(err, 'error');
+            }
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync"></i> Cập nhật';
+        });
+
+        // ===== DEVICE INFO =====
+        Promise.race([
+            fetch('https://api.ipify.org?format=json').then(r => r.json()),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 1500))
+        ]).then(d => { document.getElementById('userIP').textContent = d.ip || 'Không xác định'; })
+        .catch(() => { document.getElementById('userIP').textContent = 'Không thể lấy'; });
+
+        const ua = navigator.userAgent;
+        let browser = 'Không xác định';
+        if (ua.indexOf('Chrome') > -1) browser = 'Chrome';
+        else if (ua.indexOf('Firefox') > -1) browser = 'Firefox';
+        else if (ua.indexOf('Safari') > -1) browser = 'Safari';
+        else if (ua.indexOf('Edge') > -1) browser = 'Edge';
+        document.getElementById('userBrowser').textContent = browser + ' - ' + (navigator.platform || 'Unknown');
+
+        // ===== MENU FUNCTIONS =====
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('menuOverlay').classList.toggle('active'); }
+        function closeMenu() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('menuOverlay').classList.remove('active'); }
+        function togglePopup(e) { e.stopPropagation(); document.getElementById('settingsPopup').classList.toggle('active'); }
+        document.addEventListener('click', function(e) {
+            const popup = document.getElementById('settingsPopup');
+            const wrapper = document.querySelector('.settings-wrapper');
+            if (!wrapper.contains(e.target)) popup.classList.remove('active');
+        });
+
+        function toggleNotif() {
+            document.getElementById('notifPopup').classList.toggle('active');
+            const user = auth.currentUser;
+            const uid = user ? user.uid : localStorage.getItem('quickLoginUid');
+            if (uid && localStorage.getItem('autoView') !== 'false') {
+                db.ref('notifications').once('value', snap => {
+                    const notifs = snap.val();
+                    if (notifs) Object.keys(notifs).forEach(key => db.ref('notifications/' + key + '/readBy/' + uid).set(true));
+                });
+                document.getElementById('notifDot').classList.remove('show');
+            }
+        }
+
+        function goHome() { closeMenu(); window.location.href = '../index.html'; }
+        function goHistory() { closeMenu(); window.location.href = '../Pages/history.html'; }
+        function goTopup() { closeMenu(); showToast('💰 Đang phát triển!', 'error'); }
+        function goSupport() { closeMenu(); showToast('🆘 Đang phát triển!', 'error'); }
+        function goToProfile() { window.location.href = 'profile.html'; }
+        function goToSecurity() { window.location.href = 'security.html'; }
+        function goToSettings() { window.location.href = 'settings.html'; }
+
+        function logout() {
+            if (confirm('Đăng xuất?')) {
+                const user = auth.currentUser;
+                if (user) db.ref('presence/' + user.uid).set(false);
+                auth.signOut().then(() => {
+                    localStorage.removeItem('quickLoginUid'); localStorage.removeItem('quickLoginEmail'); localStorage.removeItem('quickLoginToken'); localStorage.removeItem('quickLoginPending');
+                    window.location.replace('../Authenticator/login.html');
+                });
+            }
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.getElementById('otpInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') verifyOTP(); });
+        document.getElementById('otpInput')?.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length === 6) { document.getElementById('otpError').classList.remove('show'); this.classList.remove('error'); }
+        });
+        document.getElementById('otpOffInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') turnOff2FA(); });
+        document.getElementById('otpOffInput')?.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length === 6) { document.getElementById('otpOffError').classList.remove('show'); this.classList.remove('error'); }
+        });
+        document.getElementById('twofaModal')?.addEventListener('click', function(e) { if (e.target === this) closeOTPModal(); });
+        document.getElementById('twofaOffModal')?.addEventListener('click', function(e) { if (e.target === this) closeTwoFAOff(); });
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'theme' || e.key === 'theme_name') { applyTheme(); }
+        });
+
+        showLoading();
+        setTimeout(() => { if (!isDataLoaded) { isDataLoaded = true; hideLoading(); } }, 3000);
+        console.log('✅ Security page loaded!');
+    </script>
+</body>
+</html>
