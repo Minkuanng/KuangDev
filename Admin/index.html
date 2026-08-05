@@ -62,10 +62,10 @@
         .theme-neon { --bg-body: #0a0a0a; --bg-card: #121212; --bg-header: #1a1a1a; --text-primary: #00ff88; --text-secondary: #00ccff; --text-muted: #666; --border-color: #333; --shadow: 0 2px 12px rgba(0,0,0,0.6); --shadow-popup: 0 8px 32px rgba(0,0,0,0.8); --wallet-bg: #1a1a1a; --hover-bg: #2a2a2a; --accent: #00ccff; }
         body { background: var(--bg-body); min-height: 100vh; transition: var(--transition); color: var(--text-primary); }
 
-        /* ===== HEADER ===== */
+        /* ===== HEADER - GIỐNG CÁC FILE KHÁC ===== */
         .header {
             background: var(--bg-header);
-            padding: 6px 14px;
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -75,70 +75,50 @@
             z-index: 100;
             transition: var(--transition);
             backdrop-filter: blur(12px);
-            min-height: 48px;
         }
-        .header-left { display: flex; align-items: center; gap: 10px; }
-        .logo { font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
-        .menu-icon { cursor: pointer; padding: 5px 7px; border-radius: 8px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: var(--transition); width: 32px; height: 32px; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { display: none; }
+        .menu-icon { cursor: pointer; padding: 6px 8px; border-radius: 8px; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: var(--transition); width: 34px; height: 34px; flex-shrink: 0; }
         .menu-icon:hover { background: var(--hover-bg); transform: scale(1.05); }
-        .menu-icon .bar { display: block; width: 16px; height: 2px; background: var(--text-secondary); border-radius: 2px; transition: var(--transition); flex-shrink: 0; }
+        .menu-icon .bar { display: block; width: 18px; height: 2px; background: var(--text-secondary); border-radius: 2px; transition: var(--transition); flex-shrink: 0; }
         .menu-icon:hover .bar { background: var(--text-primary); }
-        .header-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .wallet-container { background: var(--wallet-bg); border: 2px solid var(--border-color); border-radius: 8px; padding: 3px 10px 3px 6px; display: flex; align-items: center; gap: 6px; transition: var(--transition); min-height: 32px; }
+        .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .wallet-container { background: var(--wallet-bg); border: 2px solid var(--border-color); border-radius: 10px; padding: 4px 12px 4px 8px; display: flex; align-items: center; gap: 8px; transition: var(--transition); cursor: default; min-height: 36px; }
         .wallet-container:hover { border-color: var(--accent); }
-        .wallet-icon-box { width: 24px; height: 24px; background: var(--accent); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .wallet-icon-box i { color: #fff; font-size: 11px; }
-        .wallet-info { display: flex; flex-direction: column; line-height: 1.15; }
-        .wallet-label { font-size: 7px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-        .wallet-balance { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-        .wallet-balance span { font-size: 9px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+        .wallet-icon-box { width: 28px; height: 28px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .wallet-icon-box i { color: #fff; font-size: 13px; }
+        .wallet-info { display: flex; flex-direction: column; line-height: 1.2; }
+        .wallet-label { font-size: 8px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .wallet-balance { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .wallet-balance span { font-size: 10px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
 
-        .bell-icon { width: 32px; height: 32px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; transition: var(--transition); position: relative; font-size: 14px; color: var(--text-secondary); flex-shrink: 0; }
+        .bell-icon { width: 34px; height: 34px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; transition: var(--transition); position: relative; font-size: 15px; color: var(--text-secondary); flex-shrink: 0; }
         .bell-icon:hover { background: var(--hover-bg); transform: scale(1.05); color: var(--text-primary); }
-        .bell-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: 1px; right: 1px; border: 2px solid var(--bg-header); display: none; animation: pulse 2s infinite; }
-        .bell-dot.show { display: block; }
-        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+        .bell-icon .bell-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; position: absolute; top: 2px; right: 2px; border: 2px solid var(--bg-header); display: none; animation: pulse 2s infinite; }
+        .bell-icon .bell-dot.show { display: block; }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
 
-        /* ===== SETTINGS POPUP - GIỐNG CÁC FILE KHÁC ===== */
-        .settings-wrapper { 
-            position: relative; 
-            display: flex;
-            align-items: center;
-        }
-        .dot-menu { 
-            width: 32px; 
-            height: 32px; 
-            cursor: pointer; 
-            border-radius: 50%; 
-            background: var(--wallet-bg); 
-            border: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 2px; 
-            transition: var(--transition); 
-            padding: 5px; 
-            flex-shrink: 0; 
-        }
+        /* ===== SETTINGS POPUP - GIỐNG HỆT CÁC FILE KHÁC ===== */
+        .settings-wrapper { position: relative; }
+        .dot-menu { width: 34px; height: 34px; cursor: pointer; border-radius: 50%; background: var(--wallet-bg); border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: var(--transition); padding: 6px; flex-shrink: 0; }
         .dot-menu:hover { background: var(--hover-bg); transform: scale(1.05); }
-        .dot-menu .dot { width: 3px; height: 3px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
+        .dot-menu .dot { width: 3.5px; height: 3.5px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
         .dot-menu:hover .dot { background: var(--text-primary); }
-        
-        /* POPUP NẰM SÁT NÚT 3 CHẤM - GIỐNG CÁC FILE KHÁC */
+
         .popup { 
             position: absolute; 
-            top: 38px; 
+            top: 42px; 
             right: 0; 
             background: var(--bg-card); 
-            border-radius: var(--radius); 
+            border-radius: 10px; 
             box-shadow: var(--shadow-popup); 
-            min-width: 170px; 
+            min-width: 160px; 
             padding: 4px 0; 
             border: 1px solid var(--border-color); 
             opacity: 0; 
             visibility: hidden; 
-            transform: translateY(-6px) scale(0.96); 
+            transform: translateY(-8px) scale(0.96); 
             transition: var(--transition); 
             z-index: 200; 
         }
@@ -160,7 +140,6 @@
             background: none; 
             width: 100%; 
             font-weight: 500; 
-            text-align: left;
         }
         .popup-item:hover { 
             background: var(--hover-bg); 
@@ -178,7 +157,7 @@
         /* ===== NOTIFICATION POPUP ===== */
         .notif-popup {
             position: fixed;
-            top: 52px;
+            top: 56px;
             right: 12px;
             background: var(--bg-card);
             border-radius: 12px;
@@ -258,7 +237,6 @@
         }
         .notif-popup .notif-item.unread i { color: var(--danger); }
         
-        /* ===== DELETE BUTTON ON NOTIFICATION ===== */
         .notif-popup .notif-item .delete-notif {
             background: none;
             border: none;
@@ -329,15 +307,15 @@
         .notif-popup .notif-footer button:hover { transform: scale(1.05); opacity: 0.9; }
 
         /* ===== SIDE MENU ===== */
-        .side-menu { position: fixed; top: 0; left: -260px; width: 230px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-popup); z-index: 300; transition: var(--transition); padding: 12px 0; border-right: 1px solid var(--border-color); overflow-y: auto; }
+        .side-menu { position: fixed; top: 0; left: -260px; width: 240px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-popup); z-index: 300; transition: var(--transition); padding: 14px 0; border-right: 1px solid var(--border-color); overflow-y: auto; }
         .side-menu.active { left: 0; }
-        .side-menu .menu-header { padding: 8px 14px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .side-menu .menu-header .close { cursor: pointer; font-size: 16px; color: var(--text-muted); transition: var(--transition); padding: 2px; }
+        .side-menu .menu-header { padding: 10px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .side-menu .menu-header .close { cursor: pointer; font-size: 18px; color: var(--text-muted); transition: var(--transition); }
         .side-menu .menu-header .close:hover { color: var(--danger); transform: rotate(90deg); }
-        .side-menu .menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; transition: var(--transition); color: var(--text-primary); border: none; background: none; width: 100%; font-size: 12px; font-weight: 500; }
-        .side-menu .menu-item:hover { background: var(--hover-bg); padding-left: 20px; }
-        .side-menu .menu-item .icon { font-size: 14px; width: 22px; text-align: center; }
-        .side-menu .menu-divider { height: 1px; background: var(--border-color); margin: 3px 12px; }
+        .side-menu .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; cursor: pointer; transition: var(--transition); color: var(--text-primary); border: none; background: none; width: 100%; font-size: 13px; font-weight: 500; }
+        .side-menu .menu-item:hover { background: var(--hover-bg); padding-left: 22px; }
+        .side-menu .menu-item .icon { font-size: 16px; width: 24px; text-align: center; }
+        .side-menu .menu-divider { height: 1px; background: var(--border-color); margin: 4px 12px; }
         .menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 299; opacity: 0; visibility: hidden; transition: var(--transition); }
         .menu-overlay.active { opacity: 1; visibility: visible; }
 
@@ -505,9 +483,8 @@
         .loading-text { color: var(--text-primary); font-size: 12px; font-weight: 500; }
 
         @media (max-width: 640px) {
-            .header { padding: 4px 8px; min-height: 40px; }
-            .logo { font-size: 13px; }
-            .content { padding: 6px 8px; }
+            .header { padding: 6px 10px; }
+            .content { padding: 8px 10px; }
             .stats-grid { grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); }
             .user-grid { grid-template-columns: 1fr; }
             .product-grid { grid-template-columns: 1fr; }
@@ -517,15 +494,15 @@
             .modal .row label { min-width: auto; }
             .tabs .tab { padding: 3px 8px; font-size: 10px; }
             .admin-header h1 { font-size: 14px; }
-            .wallet-container { padding: 2px 6px 2px 4px; min-height: 26px; }
-            .wallet-icon-box { width: 20px; height: 20px; }
-            .wallet-icon-box i { font-size: 9px; }
+            .wallet-container { padding: 3px 8px 3px 6px; min-height: 30px; }
+            .wallet-icon-box { width: 22px; height: 22px; }
+            .wallet-icon-box i { font-size: 10px; }
             .wallet-balance { font-size: 11px; }
-            .wallet-label { font-size: 6px; }
-            .menu-icon { width: 26px; height: 26px; padding: 3px 5px; }
-            .menu-icon .bar { width: 13px; height: 2px; }
-            .bell-icon { width: 26px; height: 26px; font-size: 12px; }
-            .dot-menu { width: 26px; height: 26px; }
+            .wallet-label { font-size: 7px; }
+            .menu-icon { width: 28px; height: 28px; padding: 4px 6px; }
+            .menu-icon .bar { width: 14px; height: 2px; }
+            .bell-icon { width: 28px; height: 28px; font-size: 13px; }
+            .dot-menu { width: 28px; height: 28px; }
             .side-menu { width: 200px; left: -220px; }
             .popup { min-width: 140px; right: -6px; }
             .popup-item { padding: 8px 14px; font-size: 12px; }
@@ -560,7 +537,7 @@
                 <span class="bar"></span>
                 <span class="bar"></span>
             </div>
-            <div class="logo">🛠️ Admin</div>
+            <div class="logo"></div>
         </div>
         <div class="header-right">
             <div class="wallet-container">
