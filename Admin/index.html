@@ -99,7 +99,7 @@
         .bell-dot.show { display: block; }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
-        /* ===== SETTINGS POPUP - FIXED ===== */
+        /* ===== SETTINGS POPUP - GIỐNG CÁC FILE KHÁC ===== */
         .settings-wrapper { 
             position: relative; 
             display: flex;
@@ -125,15 +125,16 @@
         .dot-menu .dot { width: 3px; height: 3px; background: var(--text-secondary); border-radius: 50%; transition: var(--transition); }
         .dot-menu:hover .dot { background: var(--text-primary); }
         
+        /* POPUP NẰM SÁT NÚT 3 CHẤM - GIỐNG CÁC FILE KHÁC */
         .popup { 
             position: absolute; 
-            top: 40px; 
+            top: 38px; 
             right: 0; 
             background: var(--bg-card); 
             border-radius: var(--radius); 
             box-shadow: var(--shadow-popup); 
-            min-width: 180px; 
-            padding: 6px 0; 
+            min-width: 170px; 
+            padding: 4px 0; 
             border: 1px solid var(--border-color); 
             opacity: 0; 
             visibility: hidden; 
@@ -147,14 +148,14 @@
             transform: translateY(0) scale(1); 
         }
         .popup-item { 
-            padding: 10px 18px; 
+            padding: 8px 16px; 
             color: var(--text-primary); 
-            font-size: 13px; 
+            font-size: 12px; 
             cursor: pointer; 
             transition: var(--transition); 
             display: flex; 
             align-items: center; 
-            gap: 12px; 
+            gap: 10px; 
             border: none; 
             background: none; 
             width: 100%; 
@@ -163,12 +164,12 @@
         }
         .popup-item:hover { 
             background: var(--hover-bg); 
-            padding-left: 26px; 
+            padding-left: 22px; 
         }
         .popup-divider { 
             height: 1px; 
             background: var(--border-color); 
-            margin: 4px 14px; 
+            margin: 4px 10px; 
         }
         .popup-item.logout { 
             color: var(--danger); 
